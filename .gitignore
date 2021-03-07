@@ -104,3 +104,6 @@ lib
 # TernJS port file
 .tern-port
 .idea
+
+# Production config file
+config/production.json
