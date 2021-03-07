@@ -1,0 +1,1 @@
+export const CHEAPEST_SHIP = 'JW-MK-I';
