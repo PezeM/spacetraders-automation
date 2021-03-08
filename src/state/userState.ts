@@ -30,13 +30,33 @@ export class UserState extends BaseState<User> {
         await this._isInitialized;
     }
 
-    updateCreditsCount(newCredits: number) {
-        this._data.credits = newCredits;
+    updateData(data: Partial<User>) {
+        if (data.username) {
+            this._data.username = data.username;
+        }
+
+        if (data.loans) {
+            this._data.loans = data.loans;
+        }
+
+        if (data.credits !== undefined) {
+            this._data.credits = data.credits;
+        }
+
+        if (data.ships) {
+            this._data.ships = data.ships;
+        }
     }
 
-    addNewShip(ship: UserShip) {
-        if (this._data.ships.some(s => s.id === ship.id)) return;
+    getShipById(shipId: string): UserShip {
+        const ship = this._data.ships.find(s => s.id === shipId);
+        if (!ship) throw new Error(`Ship with id ${shipId} not found`);
+        return ship;
+    }
 
-        this._data.ships.push(ship);
+    updateShip(ship: UserShip) {
+        let shipToUpdate = this._data.ships.find(s => s.id === ship.id);
+        if (!shipToUpdate) return;
+        Object.assign(shipToUpdate, ship);
     }
 }

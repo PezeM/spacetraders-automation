@@ -5,4 +5,5 @@ export interface IConfig {
     token: string;
     strategy: ConfigStrategy;
     shipsToScrapMarket: number | "MAX";
+    marketplaceRefreshTimer: number;
 }

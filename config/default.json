@@ -1,8 +1,7 @@
 {
-  "user": {
-    "token": "",
-    "username": ""
-  },
+  "token": "",
+  "username": "",
   "strategy": "PROFIT",
-  "shipsToScrapMarket": "1"
+  "shipsToScrapMarket": "1",
+  "marketplaceRefreshTimer": "600000"
 }

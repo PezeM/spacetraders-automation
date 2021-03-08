@@ -9,10 +9,6 @@ export class LocationsState extends BaseState<Location[]> {
         super(game, []);
     }
 
-    get locations(): Location[] {
-        return this._data;
-    }
-
     public async initializeState(): Promise<void> {
         if (await this.isInitialized) return;
 

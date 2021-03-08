@@ -1,6 +1,6 @@
 import {CONFIG} from './config';
 import {Game} from "./game";
-import {RegisterUserResponse, UserResponse} from "spacetraders-api-sdk";
+import {RegisterUserResponse} from "spacetraders-api-sdk";
 import {API} from "./API";
 
 async function createNewAccount(): Promise<RegisterUserResponse> {
@@ -21,7 +21,7 @@ async function start() {
     let username = '';
     let token = '';
 
-    if (!CONFIG.has("token")) {
+    if (!CONFIG.has("token") || !CONFIG.get("token")) {
         const newAccount = await createNewAccount();
         username = newAccount.user.username;
         token = newAccount.token;
