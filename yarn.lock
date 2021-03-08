@@ -74,10 +74,10 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-spacetraders-api-sdk@^0.0.20:
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/spacetraders-api-sdk/-/spacetraders-api-sdk-0.0.20.tgz#e853b6c673663d7992ef5229c85d4fe0e157d2e1"
-  integrity sha512-zELt1L0AO5M6P8v0R6GXTDqEFRVMHcnQdKSygxTGWJS+j9zkfYgZuZUMSj1q2A9/GklpHRdKs5ApmVvO2NJ8pw==
+spacetraders-api-sdk@^0.0.21:
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/spacetraders-api-sdk/-/spacetraders-api-sdk-0.0.21.tgz#00ca48cd9ae9dd0d984788bea4c576989d0a9169"
+  integrity sha512-VqwViiA7Co0cXgdm64MB6zEp0O8BffqkvBrM4rqkFABXxep02BZveE8l1zbL+hWEhdjN0KvV9UsZ6ZgtcqA34A==
   dependencies:
     node-fetch "^2.6.1"
 

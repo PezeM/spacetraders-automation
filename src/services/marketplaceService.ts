@@ -4,8 +4,10 @@ import {buyShip, getCheapestShip, shipCargoQuantity} from "../utils/ship";
 import {API} from "../API";
 import {GoodType} from "spacetraders-api-sdk";
 import {wait} from "../utils/general";
+import {IInitializeable} from "../types/initializeable.interface";
 
-class MarketplaceService {
+class MarketplaceService implements IInitializeable {
+    private _isTimerRunning: boolean = false;
     private _isInitialized: boolean = false;
     private _timer?: NodeJS.Timeout;
 
@@ -13,13 +15,15 @@ class MarketplaceService {
         // Interval to refresh marketplace
         if (this._isInitialized) return;
 
-        await this.fetchMarketplace(game);
+        this.fetchMarketplace(game);
         this._timer = setInterval(this.fetchMarketplace.bind(this, game), CONFIG.get('marketplaceRefreshTimer'));
         this._isInitialized = true;
+        console.log('Initialized marketplace service');
     }
 
-
     private async fetchMarketplace(game: IGame) {
+        if (this._isTimerRunning) return;
+        this._isTimerRunning = true;
         console.log('Fetching marketplace');
 
         const {locationState, userState, marketplaceState} = game.state;
@@ -41,7 +45,6 @@ class MarketplaceService {
                     const refuelAmount = 50 - shipCargoQuantity(ship, GoodType.FUEL);
                     console.log(`Refueling ${refuelAmount} fuel on ship ${ship.id}`);
                     const result = await API.user.buyGood(game.token, game.username, ship.id, refuelAmount, GoodType.FUEL);
-                    console.log(`Result`, JSON.stringify(result));
                     userState.updateData(result);
                     userState.updateShip(result.ship);
                 }
@@ -67,6 +70,7 @@ class MarketplaceService {
                 const marketplaceResponse = await API.game.getLocationMarketplace(game.token, location.symbol);
                 marketplaceState.addMarketplaceData(marketplaceResponse.planet);
                 console.log(`Fetched marketplace location from planet ${location.symbol}`, marketplaceResponse.planet);
+                console.log(`Most profitable`, JSON.stringify(marketplaceState.bestProfit, null, 2));
             } catch (e) {
                 console.log(`Couldn't get marketplace data`, e);
             }
@@ -74,6 +78,7 @@ class MarketplaceService {
 
         console.log(`Fetched all marketplace data`, JSON.stringify(marketplaceState.data, null, 2));
         console.log(`Most profitable`, JSON.stringify(marketplaceState.bestProfit, null, 2));
+        this._isTimerRunning = false;
     }
 }
 

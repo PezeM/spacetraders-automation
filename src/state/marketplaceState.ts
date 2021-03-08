@@ -112,12 +112,14 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
                 buy: value,
                 sell: bestSell,
                 profitPerItem: bestSell.pricePerUnit - value.pricePerUnit,
-                profitPerItemPercentage: ((bestSell.pricePerUnit - value.pricePerUnit) / value.pricePerUnit * 100).toFixed(0),
+                profitPerItemPercentage: Number(((bestSell.pricePerUnit - value.pricePerUnit) / value.pricePerUnit * 100).toFixed(0)),
                 profitPerThousandDollars: Math.round(1000 / value.pricePerUnit) * (bestSell.pricePerUnit - value.pricePerUnit)
             });
         });
 
+        bestProfit.sort((a, b) => a.profitPerItem - b.profitPerItem);
         this._bestProfit = bestProfit;
+        this._isInitialized = new Promise(r => r(true));
         return this._bestProfit;
     }
 }

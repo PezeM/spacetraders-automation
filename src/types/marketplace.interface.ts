@@ -6,6 +6,6 @@ export interface BestProfit {
     buy: MarketplaceSeller;
     sell: MarketplaceSeller;
     profitPerItem: number;
-    profitPerItemPercentage: string;
+    profitPerItemPercentage: number;
     profitPerThousandDollars: number;
 }

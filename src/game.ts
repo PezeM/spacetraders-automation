@@ -4,6 +4,7 @@ import {API} from "./API";
 import {buyShip, getCheapestShip} from "./utils/ship";
 import {LoanService} from "./services/loanService";
 import {marketplaceService} from "./services/marketplaceService";
+import {waitFor} from "./utils/general";
 
 export class Game implements IGame {
     public readonly state: GameState;
@@ -38,7 +39,7 @@ export class Game implements IGame {
     }
 
     private async initializeGame() {
-        const {userState, locationState} = this.state;
+        const {userState, locationState, marketplaceState} = this.state;
 
         const cheapestShip = getCheapestShip(this.state.shipShopState.data);
         await new LoanService().checkIfLoanIsNeeded(this, userState);
@@ -50,5 +51,7 @@ export class Game implements IGame {
         }
 
         await marketplaceService.initializeService(this);
+        await waitFor(() => marketplaceState.bestProfit.length > 0);
+        console.log(`After wait for`, await marketplaceState.isInitialized, marketplaceState.bestProfit);
     }
 }
