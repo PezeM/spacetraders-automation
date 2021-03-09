@@ -18,7 +18,6 @@ class MarketplaceService implements IInitializeable {
         this.fetchMarketplace(game);
         this._timer = setInterval(this.fetchMarketplace.bind(this, game), CONFIG.get('marketplaceRefreshTimer'));
         this._isInitialized = true;
-        console.log('Initialized marketplace service');
     }
 
     private async fetchMarketplace(game: IGame) {
@@ -48,7 +47,7 @@ class MarketplaceService implements IInitializeable {
                     console.log(`Refueling ${refuelAmount} fuel on ship ${ship.id}`);
                     const result = await API.user.buyGood(game.token, game.username, ship.id, refuelAmount, GoodType.FUEL);
                     userState.updateData(result);
-                    ship.updateData(result.ship);
+                    console.log('After refueling', ship);
                 }
 
                 ship = userState.getShipById(shipId);

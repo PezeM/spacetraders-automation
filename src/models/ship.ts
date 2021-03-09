@@ -1,5 +1,6 @@
 import {Cargo, GoodType, UserShip} from "spacetraders-api-sdk";
 import {plainToClass, plainToClassFromExist} from "class-transformer";
+import {isValidCargo} from "../utils/ship";
 
 export class Ship implements UserShip {
     public cargo: Cargo[];
@@ -17,6 +18,7 @@ export class Ship implements UserShip {
     public y: number;
     public isScoutShip: boolean = false;
     public isTraveling: boolean = false;
+    public isBusy: boolean = false;
 
     static createShip(data: UserShip | Ship): Ship {
         return plainToClass(Ship, data);
@@ -39,16 +41,21 @@ export class Ship implements UserShip {
         if (data.x !== undefined) this.x = data.x;
         if (data.y !== undefined) this.y = data.y;
         if (data.type) this.type = data.type;
-        if (data.cargo) data.cargo.forEach(v => this.updateCargo(v.good, v));
+        if (data.cargo) {
+            data.cargo.forEach(v => this.updateCargo(v.good, v));
+        }
 
         return this;
     }
 
-    updateCargo(goodType: GoodType, cargo: Partial<Cargo>): boolean {
+    updateCargo(goodType: GoodType, cargo: Partial<Cargo> | Cargo): Ship {
         let index = this.cargo.findIndex(c => c.good === goodType);
-        if (index === -1) return false;
+        if (index === -1 && isValidCargo(cargo)) {
+            this.cargo.push(cargo);
+            return this;
+        }
 
         this.cargo[index] = {...this.cargo[index], ...cargo};
-        return true;
+        return this;
     }
 }

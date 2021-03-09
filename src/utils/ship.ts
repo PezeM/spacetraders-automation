@@ -1,4 +1,4 @@
-import {GoodType, ShopShip, UserShip} from "spacetraders-api-sdk";
+import {Cargo, GoodType, ShopShip, UserShip} from "spacetraders-api-sdk";
 import {CheapestShip} from "../types/ship.type";
 import {API} from "../API";
 import {IGame} from "../types/game.interface";
@@ -51,4 +51,19 @@ export const getScoutShipId = (game: IGame, isTraveling = false): string | undef
 
     const cheapestShip = getCheapestShip(shipShopState.data);
     return userState.data.ships.find(s => s.type === cheapestShip.ship.type)?.id;
+}
+
+export const isValidCargo = (input: any): input is Cargo => {
+    const schema: Record<keyof Cargo, string> = {
+        good: 'string',
+        quantity: 'number',
+        totalVolume: 'number'
+    };
+
+    const missingProperties = Object.keys(schema)
+        .filter(key => input[key] === undefined)
+        .map(key => key as keyof Cargo)
+        .map(key => new Error(`Document is missing ${key} ${schema[key]}`));
+
+    return missingProperties.length === 0;
 }

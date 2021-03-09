@@ -33,7 +33,7 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     }
 
     getMarketplaceData(symbol: string) {
-        return this._data.find(m => m.symbol === symbol);
+        return this._data.find(m => m.symbol === symbol)?.marketplace;
     }
 
     addMarketplaceData(planetMarketplace: PlanetMarketplace) {

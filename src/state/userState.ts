@@ -1,9 +1,10 @@
 import {BaseState} from "./baseState";
-import {User, UserShip} from "spacetraders-api-sdk";
+import {UserShip} from "spacetraders-api-sdk";
 import {IGame} from "../types/game.interface";
 import {API} from "../API";
 import {GameUser} from "../types/user.interface";
 import {Ship} from "../models/ship";
+import {ExtendedUserData} from "../types/user.type";
 
 export class UserState extends BaseState<GameUser> {
     constructor(game: IGame) {
@@ -37,7 +38,7 @@ export class UserState extends BaseState<GameUser> {
         await this._isInitialized;
     }
 
-    updateData(data: Partial<User>) {
+    updateData(data: Partial<ExtendedUserData>) {
         if (data.username) {
             this._data.username = data.username;
         }
@@ -61,6 +62,13 @@ export class UserState extends BaseState<GameUser> {
                 }
             }
         }
+
+        if (data.ship) {
+            const ship = this.data.ships.find(s => s.id === data.ship?.id);
+            if (ship) {
+                ship.updateData(data.ship);
+            }
+        }
     }
 
     getShipById(shipId: string): Ship {
@@ -76,6 +84,6 @@ export class UserState extends BaseState<GameUser> {
     }
 
     getShips(scoutShip = false) {
-        return this.data.ships.find(s => s.isScoutShip === scoutShip);
+        return this.data.ships.filter(s => s.isScoutShip === scoutShip);
     }
 }
