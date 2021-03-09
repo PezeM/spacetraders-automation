@@ -2,6 +2,7 @@ import {BaseState} from "./baseState";
 import {IGame, MarketplaceSeller} from "../types/game.interface";
 import {GoodType, PlanetMarketplace} from "spacetraders-api-sdk";
 import {BestProfit} from "../types/marketplace.interface";
+import {distance} from "../utils/math";
 
 export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -29,6 +30,10 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
 
     async initializeState(): Promise<void> {
         this._isInitialized = new Promise(r => r(false));
+    }
+
+    getMarketplaceData(symbol: string) {
+        return this._data.find(m => m.symbol === symbol);
     }
 
     addMarketplaceData(planetMarketplace: PlanetMarketplace) {
@@ -113,13 +118,18 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
                 sell: bestSell,
                 profitPerItem: bestSell.pricePerUnit - value.pricePerUnit,
                 profitPerItemPercentage: Number(((bestSell.pricePerUnit - value.pricePerUnit) / value.pricePerUnit * 100).toFixed(0)),
-                profitPerThousandDollars: Math.round(1000 / value.pricePerUnit) * (bestSell.pricePerUnit - value.pricePerUnit)
+                profitPerThousandDollars: Math.round((1000 / value.pricePerUnit) * (bestSell.pricePerUnit - value.pricePerUnit)),
+                distance: Math.floor(distance(value.location, bestSell.location))
             });
         });
 
-        bestProfit.sort((a, b) => a.profitPerItem - b.profitPerItem);
+        bestProfit.sort((a, b) => b.profitPerItemPercentage - a.profitPerItemPercentage);
         this._bestProfit = bestProfit;
         this._isInitialized = new Promise(r => r(true));
         return this._bestProfit;
+    }
+
+    computeLeastProfitable() {
+        // TODO: Add least profitable trades
     }
 }

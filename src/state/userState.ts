@@ -2,8 +2,10 @@ import {BaseState} from "./baseState";
 import {User, UserShip} from "spacetraders-api-sdk";
 import {IGame} from "../types/game.interface";
 import {API} from "../API";
+import {GameUser} from "../types/user.interface";
+import {Ship} from "../models/ship";
 
-export class UserState extends BaseState<User> {
+export class UserState extends BaseState<GameUser> {
     constructor(game: IGame) {
         super(game, {
             username: game.username,
@@ -18,7 +20,12 @@ export class UserState extends BaseState<User> {
 
         this._isInitialized = new Promise<boolean>(async (resolve, reject) => {
             API.user.getUser(this._game.token, this._game.username).then(user => {
-                this._data = user.user;
+                this._data = {
+                    credits: user.user.credits,
+                    loans: user.user.loans,
+                    username: user.user.username,
+                    ships: user.user.ships.map(s => Ship.createShip(s))
+                }
 
                 console.log(`Initialized user state with user named ${this._data.username}`);
                 console.log(`Credits ${this._data.credits}`);
@@ -44,19 +51,31 @@ export class UserState extends BaseState<User> {
         }
 
         if (data.ships) {
-            this._data.ships = data.ships;
+            for (const ship of data.ships) {
+                const userShip = this._data.ships.find(s => s.id === ship.id);
+                if (userShip) {
+                    const index = this._data.ships.indexOf(userShip);
+                    this._data.ships[index] = Ship.createShipFromExist(userShip, ship);
+                } else {
+                    this._data.ships.push(Ship.createShip(ship));
+                }
+            }
         }
     }
 
-    getShipById(shipId: string): UserShip {
+    getShipById(shipId: string): Ship {
         const ship = this._data.ships.find(s => s.id === shipId);
         if (!ship) throw new Error(`Ship with id ${shipId} not found`);
         return ship;
     }
 
     updateShip(ship: UserShip) {
-        let shipToUpdate = this._data.ships.find(s => s.id === ship.id);
-        if (!shipToUpdate) return;
-        Object.assign(shipToUpdate, ship);
+        const index = this._data.ships.findIndex(s => s.id === ship.id);
+        if (index === -1) return;
+        this._data.ships[index] = Ship.createShipFromExist(this._data.ships[index], ship);
+    }
+
+    getShips(scoutShip = false) {
+        return this.data.ships.find(s => s.isScoutShip === scoutShip);
     }
 }

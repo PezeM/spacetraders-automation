@@ -8,4 +8,5 @@ export interface BestProfit {
     profitPerItem: number;
     profitPerItemPercentage: number;
     profitPerThousandDollars: number;
+    distance: number;
 }

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import {CONFIG} from './config';
 import {Game} from "./game";
 import {RegisterUserResponse} from "spacetraders-api-sdk";

@@ -41,5 +41,14 @@ export const buyShip = async (game: IGame, location: string, shipType: string): 
     }
 }
 
-export const remainingCargoSpace = (ship: UserShip): number => ship.maxCargo - ship.cargo.reduce((p, c) => p + c.quantity, 0);
+export const remainingCargoSpace = (ship: UserShip): number => ship.maxCargo - ship.cargo.reduce((p, c) => p + c.totalVolume, 0);
 export const shipCargoQuantity = (ship: UserShip, good: GoodType): number => ship.cargo.find(c => c.good === good)?.quantity ?? 0;
+
+export const getScoutShipId = (game: IGame, isTraveling = false): string | undefined => {
+    const {userState, shipShopState} = game.state;
+    let ship = userState.data.ships.find(s => s.isScoutShip && s.isTraveling === isTraveling);
+    if (ship) return ship.id;
+
+    const cheapestShip = getCheapestShip(shipShopState.data);
+    return userState.data.ships.find(s => s.type === cheapestShip.ship.type)?.id;
+}

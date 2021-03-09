@@ -1,6 +1,6 @@
 import {IGame} from "../types/game.interface";
 import {CONFIG} from "../config";
-import {buyShip, getCheapestShip, shipCargoQuantity} from "../utils/ship";
+import {buyShip, getCheapestShip, getScoutShipId, remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
 import {API} from "../API";
 import {GoodType} from "spacetraders-api-sdk";
 import {wait} from "../utils/general";
@@ -27,10 +27,11 @@ class MarketplaceService implements IInitializeable {
         console.log('Fetching marketplace');
 
         const {locationState, userState, marketplaceState} = game.state;
-        const cheapestShip = getCheapestShip(game.state.shipShopState.data);
 
-        let shipId = userState.data.ships.find(s => s.type === cheapestShip.ship.type)?.id;
+        // Get scout ship id, if no scout ship then buy one
+        let shipId = getScoutShipId(game);
         if (!shipId) {
+            const cheapestShip = getCheapestShip(game.state.shipShopState.data);
             const newShip = await buyShip(game, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
             shipId = newShip.id;
         }
@@ -39,14 +40,15 @@ class MarketplaceService implements IInitializeable {
             console.log(`Fetching marketplace data in location ${location.symbol}`);
 
             let ship = userState.getShipById(shipId);
+            ship.isScoutShip = true;
             try {
                 if (shipCargoQuantity(ship, GoodType.FUEL) < 50) {
                     // Refill fuel
-                    const refuelAmount = 50 - shipCargoQuantity(ship, GoodType.FUEL);
+                    const refuelAmount = Math.min(remainingCargoSpace(ship), 50 - shipCargoQuantity(ship, GoodType.FUEL));
                     console.log(`Refueling ${refuelAmount} fuel on ship ${ship.id}`);
                     const result = await API.user.buyGood(game.token, game.username, ship.id, refuelAmount, GoodType.FUEL);
                     userState.updateData(result);
-                    userState.updateShip(result.ship);
+                    ship.updateData(result.ship);
                 }
 
                 ship = userState.getShipById(shipId);
@@ -58,12 +60,8 @@ class MarketplaceService implements IInitializeable {
                     await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 1000);
                     console.log(`Ship: ${ship.id} arrived at: ${location.symbol}`);
 
-                    const cargo = ship.cargo.find(g => g.good === GoodType.FUEL);
-                    if (cargo) {
-                        cargo.quantity = flyInfo.flightPlan.fuelRemaining
-                        cargo.totalVolume = flyInfo.flightPlan.fuelRemaining;
-                        console.log('Updated fuel quantity to', cargo.quantity);
-                    }
+                    const remainingFuel = flyInfo.flightPlan.fuelRemaining;
+                    ship.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});
                 }
 
                 // Get marketplace data
