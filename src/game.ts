@@ -68,7 +68,7 @@ export class Game implements IGame {
             const shipToBuy = CONFIG.get('shipToBuy');
             if (!shipToBuy) return;
             let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
-            if (!minMoneyLeft || this.state.userState.data.credits < minMoneyLeft) return;
+            if (!minMoneyLeft || isNaN(minMoneyLeft)) return;
 
             await this.state.shipShopState.isInitialized;
             const ship = this.state.shipShopState.data.find(s => s.type === shipToBuy);
@@ -76,6 +76,9 @@ export class Game implements IGame {
                 console.log(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`);
                 return;
             }
+
+            const shipPrice = ship.purchaseLocations[0].price;
+            if (this.state.userState.data.credits - shipPrice < minMoneyLeft) return;
 
             await buyShip(this, ship.purchaseLocations[0].location, ship.type);
         }
@@ -103,7 +106,7 @@ export class Game implements IGame {
 
             const creditsCanAfford = userState.data.credits / item.pricePerUnit;
             const spaceCanAfford = ship.spaceAvailable / item.volumePerUnit;
-            const toBuy = Math.min(creditsCanAfford, spaceCanAfford, item.quantityAvailable, amount);
+            const toBuy = Math.floor(Math.min(creditsCanAfford, spaceCanAfford, item.quantityAvailable, amount));
 
             if (isNaN(toBuy) || toBuy <= 0) return;
             await buyGood(ship, goodType, toBuy);
