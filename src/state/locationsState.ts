@@ -3,6 +3,7 @@ import {Location} from "spacetraders-api-sdk";
 import {IGame} from "../types/game.interface";
 import {LOCATION_SYMBOLS} from "../constants/planets";
 import {API} from "../API";
+import logger from "../logger";
 
 export class LocationsState extends BaseState<Location[]> {
     constructor(game: IGame) {
@@ -14,7 +15,7 @@ export class LocationsState extends BaseState<Location[]> {
 
         this._isInitialized = new Promise<boolean>(async (resolve, reject) => {
             this.fetchLocationsInSystem().then(_ => {
-                console.log(`Initialized locations state with ${this._data.length} locations.`);
+                logger.info(`Initialized locations state with ${this._data.length} locations.`);
                 resolve(true);
             }, reject).catch(reject);
         });

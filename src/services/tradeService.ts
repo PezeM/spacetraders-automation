@@ -3,6 +3,7 @@ import {shipCargoQuantity} from "../utils/ship";
 import {GoodType} from "spacetraders-api-sdk";
 import {Ship} from "../models/ship";
 import {API} from "../API";
+import logger from "../logger";
 
 export class TradeService {
     constructor(private _game: IGame) {
@@ -36,7 +37,7 @@ export class TradeService {
         this._game.state.userState.updateData(response);
         const order = response?.order?.find(o => o.good === goodType);
         if (!order) return;
-        console.log(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`)
+        logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
     }
 
     async sell(ship: Ship, goodType: GoodType, amount: number) {
@@ -45,6 +46,6 @@ export class TradeService {
         this._game.state.userState.updateData(response);
         const order = response?.order?.find(o => o.good === goodType);
         if (!order) return;
-        console.log(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`)
+        logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
     }
 }

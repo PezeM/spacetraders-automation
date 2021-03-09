@@ -1,8 +1,6 @@
 import config from 'config';
 import {IConfig} from "./types/config.interface";
 
-console.log(`Loaded config`, config);
-
 // Adds type safety to config
 class Config {
     util: config.IUtil = config.util;

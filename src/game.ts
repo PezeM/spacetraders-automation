@@ -8,6 +8,7 @@ import {Ship} from "./models/ship";
 import {GoodType} from "spacetraders-api-sdk";
 import {CONFIG} from "./config";
 import logger from "./logger";
+import {ITradeData} from "./types/config.interface";
 
 export class Game implements IGame {
     public readonly state: GameState;
@@ -25,7 +26,7 @@ export class Game implements IGame {
                     process.exit(0);
                 }
 
-                logger.debug('Spacetraders servers is available')
+                logger.debug('Spacetraders server is available')
                 await new UserStartupService().throwIfUserDoesntExist(this._username, this._token);
                 await this.state.initializeStates();
 
@@ -74,7 +75,7 @@ export class Game implements IGame {
             await this.state.shipShopState.isInitialized;
             const ship = this.state.shipShopState.data.find(s => s.type === shipToBuy);
             if (!ship) {
-                console.log(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`);
+                logger.warn(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`)
                 return;
             }
 
@@ -131,7 +132,7 @@ export class Game implements IGame {
         }
 
         const fly = async (ship: Ship, destination: string) => {
-            if (ship.location === destination) return;
+            if (!ship.location || ship.location === destination) return;
             ship.isTraveling = true;
 
             const flyInfo = await API.user.createFlightPlan(this._token, this._username, ship.id, destination);
@@ -145,34 +146,36 @@ export class Game implements IGame {
             ship.isTraveling = false;
         }
 
-        const buyLocation = 'OE-PM';
-        const sellLocation = 'OE-PM-TR';
-        const itemToTrade = GoodType.WORKERS;
+        const trade = CONFIG.has('defaultTrade') ? CONFIG.get('defaultTrade') as ITradeData : {
+            source: 'OE-PM',
+            destination: 'OE-PM-TR',
+            itemToTrade: GoodType.WORKERS
+        };
 
         try {
             // Buy
             // Fly to buy location
-            const goods = shipCargoQuantity(ship, itemToTrade);
+            const goods = shipCargoQuantity(ship, trade.itemToTrade);
             if (!goods) {
                 // Refuel
                 await refuel();
 
-                await fly(ship, buyLocation);
-                await buy(ship, itemToTrade, remainingCargoSpace(ship));
+                await fly(ship, trade.source);
+                await buy(ship, trade.itemToTrade, remainingCargoSpace(ship));
             }
 
             // Fly to sell location
             // Sell
             // Refuel
-            await fly(ship, sellLocation);
-            const toSellAmount = shipCargoQuantity(ship, itemToTrade);
-            await sell(ship, itemToTrade, toSellAmount);
+            await fly(ship, trade.destination);
+            const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
+            await sell(ship, trade.itemToTrade, toSellAmount);
             await refuel();
             // End
 
-            console.log(userState.toString());
+            logger.info(userState.toString());
         } catch (e) {
-            console.log(`Error while trading with ship ${ship.id}`, e);
+            logger.error(`Error while trading with ship ${ship.id}`, e);
             ship.isTraveling = false;
         }
 

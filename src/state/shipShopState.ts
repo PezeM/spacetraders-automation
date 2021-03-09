@@ -2,6 +2,7 @@ import {BaseState} from "./baseState";
 import {ShopShip} from "spacetraders-api-sdk";
 import {API} from "../API";
 import {IGame} from "../types/game.interface";
+import logger from "../logger";
 
 export class ShipShopState extends BaseState<ShopShip[]> {
     constructor(game: IGame) {
@@ -15,7 +16,7 @@ export class ShipShopState extends BaseState<ShopShip[]> {
             API.game.getAvailableShips(this._game.token).then(ships => {
                 this._data = ships.ships;
 
-                console.log(`Initialized ship shop state with ${this._data.length} ships.`);
+                logger.info(`Initialized ship shop state with ${this._data.length} ships.`);
                 resolve(true);
             }, reject).catch(reject);
         });

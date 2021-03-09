@@ -3,6 +3,7 @@ import {plainToClass, plainToClassFromExist} from "class-transformer";
 import {isValidCargo} from "../utils/ship";
 import {API} from "../API";
 import {wait} from "../utils/general";
+import logger from "../logger";
 
 export class Ship implements UserShip {
     public cargo: Cargo[];
@@ -64,9 +65,9 @@ export class Ship implements UserShip {
         this.isTraveling = true;
 
         const flyInfo = await API.user.createFlightPlan(token, username, this.id, destination);
-        console.log(`Ship ${this.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
+        logger.info(`Ship ${this.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}`, {shipId: this.id});
         await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
-        console.log(`Ship ${this.id} arrived at ${destination}`);
+        logger.info(`Ship ${this.id} arrived at ${destination}`, {shipId: this.id});
 
         const remainingFuel = flyInfo.flightPlan.fuelRemaining;
         this.updateData({location: flyInfo.flightPlan.destination});

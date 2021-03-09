@@ -3,6 +3,7 @@ import {IGame} from "../types/game.interface";
 import {LocationsState} from "./locationsState";
 import {UserState} from "./userState";
 import {MarketplaceState} from "./marketplaceState";
+import logger from "../logger";
 
 export class GameState {
     public readonly shipShopState: ShipShopState;
@@ -18,7 +19,7 @@ export class GameState {
     }
 
     async initializeStates() {
-        console.log('Initializing game state');
+        logger.debug('Initializing game state');
 
         await Promise.all([
             this.shipShopState.initializeState(),

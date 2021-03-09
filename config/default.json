@@ -8,8 +8,8 @@
   "defaultTrade": {
     "source": "OE-PM",
     "destination": "OE-PM-TR",
-    "itemToTrade": "WORKERS"
+    "itemToTrade": "SHIP_PLATING"
   },
   "shipToBuy": "GR-MK-I",
-  "minMoneyLeftAfterBuyingShip": 30000
+  "minMoneyLeftAfterBuyingShip": 10000
 }
