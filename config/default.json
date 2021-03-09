@@ -1,4 +1,5 @@
 {
+  "logsDir": "logs",
   "token": "",
   "username": "",
   "strategy": "PROFIT",

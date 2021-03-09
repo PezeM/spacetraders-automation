@@ -7,6 +7,7 @@ import {UserStartupService} from "./services/userStartupService";
 import {Ship} from "./models/ship";
 import {GoodType} from "spacetraders-api-sdk";
 import {CONFIG} from "./config";
+import logger from "./logger";
 
 export class Game implements IGame {
     public readonly state: GameState;
@@ -14,21 +15,21 @@ export class Game implements IGame {
     private _utilityInterval: NodeJS.Timeout;
 
     constructor(private _token: string, private _username: string) {
-        console.info("Initialized game instance");
+        logger.info('Initialized game instance');
         this.state = new GameState(this);
 
         API.game.isOnline()
             .then(async (isServerOnline) => {
                 if (!isServerOnline) {
-                    console.error(`Spacetraders api is not available. Try later...`);
+                    logger.crit('Spacetraders api is not available. Try later...');
                     process.exit(0);
                 }
 
-                console.log('Spacetraders servers is available');
+                logger.debug('Spacetraders servers is available')
                 await new UserStartupService().throwIfUserDoesntExist(this._username, this._token);
                 await this.state.initializeStates();
 
-                console.log(`Start state`, JSON.stringify(this.state.userState.data, null, 2));
+                logger.info('Start user state', {userState: this.state.userState.data});
 
                 await this.initializeGame();
             });

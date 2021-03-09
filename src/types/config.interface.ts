@@ -2,6 +2,7 @@ import {ConfigStrategy} from "./enums/config.enum";
 import {GoodType} from "spacetraders-api-sdk";
 
 export interface IConfig {
+    logsDir: string;
     username: string;
     token: string;
     strategy: ConfigStrategy;
