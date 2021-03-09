@@ -3,5 +3,12 @@
   "username": "",
   "strategy": "PROFIT",
   "shipsToScrapMarket": "1",
-  "marketplaceRefreshTimer": "600000"
+  "marketplaceRefreshTimer": "600000",
+  "defaultTrade": {
+    "source": "OE-PM",
+    "destination": "OE-PM-TR",
+    "itemToTrade": "WORKERS"
+  },
+  "shipToBuy": "GR-MK-I",
+  "minMoneyLeftAfterBuyingShip": 30000
 }

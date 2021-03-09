@@ -1,14 +1,17 @@
 import {IGame} from "./types/game.interface";
 import {GameState} from "./state/gameState";
 import {API} from "./API";
-import {remainingCargoSpace, shipCargoQuantity} from "./utils/ship";
+import {buyShip, remainingCargoSpace, shipCargoQuantity} from "./utils/ship";
 import {wait} from "./utils/general";
 import {UserStartupService} from "./services/userStartupService";
 import {Ship} from "./models/ship";
 import {GoodType} from "spacetraders-api-sdk";
+import {CONFIG} from "./config";
 
 export class Game implements IGame {
     public readonly state: GameState;
+    private _gameLoopInterval: NodeJS.Timeout;
+    private _utilityInterval: NodeJS.Timeout;
 
     constructor(private _token: string, private _username: string) {
         console.info("Initialized game instance");
@@ -40,22 +43,42 @@ export class Game implements IGame {
     }
 
     private async initializeGame() {
-        const {userState, locationState, marketplaceState} = this.state;
-
         await new UserStartupService().prepareGame(this);
         // await marketplaceService.initializeService(this);
         // await waitFor(() => marketplaceState.bestProfit.length > 0);
         // console.log(`After wait for`, await marketplaceState.isInitialized, marketplaceState.bestProfit);
 
-        setInterval(() => {
-            // console.log('In the fucking interval');
-            const ships = userState.getShips(false);
+        this._gameLoopInterval = setInterval(this.gameLoop, 1000);
+        this._utilityInterval = setInterval(this.utilityLoop, 60000);
+    }
 
-            for (const ship of ships) {
-                if (ship.isBusy) return;
-                this.trade(ship);
+    private gameLoop = async () => {
+        const ships = this.state.userState.getShips(false);
+
+        // There should be fetch for best trades
+        for (const ship of ships) {
+            if (ship.isBusy) return;
+            this.trade(ship);
+        }
+    }
+
+    private utilityLoop = async () => {
+        // Buy ship
+        if (CONFIG.has('shipToBuy')) {
+            const shipToBuy = CONFIG.get('shipToBuy');
+            if (!shipToBuy) return;
+            let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
+            if (!minMoneyLeft || this.state.userState.data.credits < minMoneyLeft) return;
+
+            await this.state.shipShopState.isInitialized;
+            const ship = this.state.shipShopState.data.find(s => s.type === shipToBuy);
+            if (!ship) {
+                console.log(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`);
+                return;
             }
-        }, 1000);
+
+            await buyShip(this, ship.purchaseLocations[0].location, ship.type);
+        }
     }
 
     private async trade(ship: Ship) {
@@ -63,15 +86,16 @@ export class Game implements IGame {
 
         ship.isBusy = true;
 
-        const refuel = async (wantedFuel: number = 30) => {
+        const refuel = async (wantedFuel: number = 15) => {
             const fuelInCargo = shipCargoQuantity(ship, GoodType.FUEL);
             const neededFuel = wantedFuel - fuelInCargo;
             if (neededFuel <= 0) return;
 
-            await buy(ship, GoodType.FUEL, wantedFuel);
+            await buy(ship, GoodType.FUEL, neededFuel);
         }
 
         const buy = async (ship: Ship, goodType: GoodType, amount: number) => {
+            // TODO: Fetch marketplace only if it's not cached
             const marketplaceResponse = await API.game.getLocationMarketplace(this._token, ship.location);
             marketplaceState.addMarketplaceData(marketplaceResponse.planet);
             const item = marketplaceState.getMarketplaceData(ship.location)?.find(i => i.symbol === goodType);
@@ -112,6 +136,7 @@ export class Game implements IGame {
             console.log(`Ship ${ship.id} arrived at ${destination}`);
 
             const remainingFuel = flyInfo.flightPlan.fuelRemaining;
+            ship.updateData({location: flyInfo.flightPlan.destination});
             ship.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});
             ship.isTraveling = false;
         }
@@ -121,13 +146,16 @@ export class Game implements IGame {
         const itemToTrade = GoodType.WORKERS;
 
         try {
-            // Refuel
-            await refuel();
-
             // Buy
             // Fly to buy location
-            await fly(ship, buyLocation);
-            await buy(ship, itemToTrade, remainingCargoSpace(ship));
+            const goods = shipCargoQuantity(ship, itemToTrade);
+            if (!goods) {
+                // Refuel
+                await refuel();
+
+                await fly(ship, buyLocation);
+                await buy(ship, itemToTrade, remainingCargoSpace(ship));
+            }
 
             // Fly to sell location
             // Sell
@@ -137,6 +165,8 @@ export class Game implements IGame {
             await sell(ship, itemToTrade, toSellAmount);
             await refuel();
             // End
+
+            console.log(userState.toString());
         } catch (e) {
             console.log(`Error while trading with ship ${ship.id}`, e);
             ship.isTraveling = false;

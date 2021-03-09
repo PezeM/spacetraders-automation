@@ -34,6 +34,7 @@ export const buyShip = async (game: IGame, location: string, shipType: string): 
         const newShip = result.user.ships[result.user.ships.length - 1];
         console.log(`Bought new ship ${shipType}`);
         game.state.userState.updateData(result.user);
+        console.log(game.state.userState.toString());
         return newShip;
     } catch (e) {
         console.error(`Couldn't buy ship type ${shipType}. Remaining credit ${game.state.userState.data.credits}`);

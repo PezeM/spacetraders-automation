@@ -28,9 +28,6 @@ export class UserState extends BaseState<GameUser> {
                     ships: user.user.ships.map(s => Ship.createShip(s))
                 }
 
-                console.log(`Initialized user state with user named ${this._data.username}`);
-                console.log(`Credits ${this._data.credits}`);
-                console.log(`Ships ${this._data.ships.length}`);
                 resolve(true);
             }, reject).catch(reject);
         })
@@ -85,5 +82,9 @@ export class UserState extends BaseState<GameUser> {
 
     getShips(scoutShip = false) {
         return this.data.ships.filter(s => s.isScoutShip === scoutShip);
+    }
+
+    toString() {
+        return `Credits: ${this._data.credits}`;
     }
 }

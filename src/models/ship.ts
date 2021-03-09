@@ -41,9 +41,7 @@ export class Ship implements UserShip {
         if (data.x !== undefined) this.x = data.x;
         if (data.y !== undefined) this.y = data.y;
         if (data.type) this.type = data.type;
-        if (data.cargo) {
-            data.cargo.forEach(v => this.updateCargo(v.good, v));
-        }
+        if (data.cargo) this.cargo = data.cargo;
 
         return this;
     }

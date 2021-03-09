@@ -1,7 +1,7 @@
 import {MarketplaceSeller} from "./game.interface";
 import {GoodType} from "spacetraders-api-sdk";
 
-export interface BestProfit {
+export interface MarketplaceProfit {
     symbol: GoodType;
     buy: MarketplaceSeller;
     sell: MarketplaceSeller;
