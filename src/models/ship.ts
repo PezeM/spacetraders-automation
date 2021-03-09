@@ -1,6 +1,8 @@
 import {Cargo, GoodType, UserShip} from "spacetraders-api-sdk";
 import {plainToClass, plainToClassFromExist} from "class-transformer";
 import {isValidCargo} from "../utils/ship";
+import {API} from "../API";
+import {wait} from "../utils/general";
 
 export class Ship implements UserShip {
     public cargo: Cargo[];
@@ -55,5 +57,20 @@ export class Ship implements UserShip {
 
         this.cargo[index] = {...this.cargo[index], ...cargo};
         return this;
+    }
+
+    async fly(destination: string, token: string, username: string) {
+        if (this.location === destination || this.isTraveling) return;
+        this.isTraveling = true;
+
+        const flyInfo = await API.user.createFlightPlan(token, username, this.id, destination);
+        console.log(`Ship ${this.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
+        await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
+        console.log(`Ship ${this.id} arrived at ${destination}`);
+
+        const remainingFuel = flyInfo.flightPlan.fuelRemaining;
+        this.updateData({location: flyInfo.flightPlan.destination});
+        this.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});
+        this.isTraveling = false;
     }
 }

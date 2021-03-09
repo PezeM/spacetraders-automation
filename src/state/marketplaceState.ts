@@ -1,8 +1,9 @@
 import {BaseState} from "./baseState";
 import {IGame, MarketplaceSeller} from "../types/game.interface";
-import {GoodType, PlanetMarketplace} from "spacetraders-api-sdk";
+import {GoodType, Marketplace, PlanetMarketplace} from "spacetraders-api-sdk";
 import {MarketplaceProfit} from "../types/marketplace.interface";
 import {distance} from "../utils/math";
+import {API} from "../API";
 
 export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -40,6 +41,15 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
 
     getMarketplaceData(symbol: string) {
         return this._data.find(m => m.symbol === symbol)?.marketplace;
+    }
+
+    async getOrCreateMarketplaceData(location: string, token: string): Promise<Marketplace[]> {
+        let marketplace = this.getMarketplaceData(location);
+        if (marketplace) return marketplace;
+
+        const marketplaceResponse = await API.game.getLocationMarketplace(token, location);
+        this.addMarketplaceData(marketplaceResponse.planet);
+        return marketplaceResponse.planet.marketplace;
     }
 
     addMarketplaceData(planetMarketplace: PlanetMarketplace) {
