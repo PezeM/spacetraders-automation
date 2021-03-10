@@ -31,6 +31,8 @@ export class Game implements IGame {
                 await this.state.initializeStates();
 
                 logger.info('Start user state', {userState: this.state.userState.data});
+                logger.info(this.state.userState);
+                logger.info(`Ships ${this.state.userState.data.ships.length}`);
 
                 await this.initializeGame();
             });
@@ -61,6 +63,7 @@ export class Game implements IGame {
         for (const ship of ships) {
             if (ship.isBusy) continue;
             this.trade(ship);
+            await wait(1000);
         }
     }
 

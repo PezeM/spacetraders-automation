@@ -10,5 +10,6 @@ export interface IGame {
 export interface MarketplaceSeller {
     location: Location;
     pricePerUnit: number;
+    volumePerUnit: number;
     available: number;
 }

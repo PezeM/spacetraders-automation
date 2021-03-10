@@ -65,13 +65,14 @@ export class Ship implements UserShip {
         this.isTraveling = true;
 
         const flyInfo = await API.user.createFlightPlan(token, username, this.id, destination);
-        logger.info(`Ship ${this.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}`, {shipId: this.id});
-        await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
+        const {fuelRemaining, timeRemainingInSeconds} = flyInfo.flightPlan;
+
+        logger.info(`Ship ${this.id} flying to ${destination}. Time ${timeRemainingInSeconds}`, {shipId: this.id});
+        await wait(timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
         logger.info(`Ship ${this.id} arrived at ${destination}`, {shipId: this.id});
 
-        const remainingFuel = flyInfo.flightPlan.fuelRemaining;
-        this.updateData({location: flyInfo.flightPlan.destination});
-        this.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});
+        this.updateData({location: destination});
+        this.updateCargo(GoodType.FUEL, {totalVolume: fuelRemaining, quantity: fuelRemaining});
         this.isTraveling = false;
     }
 }

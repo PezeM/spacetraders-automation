@@ -4,6 +4,7 @@ import {GoodType, Marketplace, PlanetMarketplace} from "spacetraders-api-sdk";
 import {MarketplaceProfit} from "../types/marketplace.interface";
 import {distance} from "../utils/math";
 import {API} from "../API";
+import {MarketplaceProfitType} from "../types/marketplace.type";
 
 export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -66,6 +67,10 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
         this.computeLeastProfitable();
     }
 
+    getBestProfitBy(sortedBy: MarketplaceProfitType) {
+        return this._bestProfit.sort((a, b) => b[sortedBy] - a[sortedBy]);
+    }
+
     computeBestProfit() {
         const bestProfit: MarketplaceProfit[] = [];
 
@@ -73,13 +78,15 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
             const bestSell = this._bestSellers.get(key);
             if (!bestSell || bestSell.pricePerUnit === value.pricePerUnit) return;
 
+            const profitPerItem = bestSell.pricePerUnit - value.pricePerUnit;
             bestProfit.push({
                 symbol: key,
                 buy: value,
                 sell: bestSell,
-                profitPerItem: bestSell.pricePerUnit - value.pricePerUnit,
-                profitPerItemPercentage: Number(((bestSell.pricePerUnit - value.pricePerUnit) / value.pricePerUnit * 100).toFixed(0)),
-                profitPerThousandDollars: Math.round((1000 / value.pricePerUnit) * (bestSell.pricePerUnit - value.pricePerUnit)),
+                profitPerItem,
+                profitPerVolume: Math.floor(profitPerItem / value.volumePerUnit),
+                profitPerItemPercentage: Number((profitPerItem / value.pricePerUnit * 100).toFixed(0)),
+                profitPerThousandDollars: Math.round((1000 / value.pricePerUnit) * profitPerItem),
                 distance: Math.floor(distance(value.location, bestSell.location))
             });
         });
@@ -97,13 +104,15 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
             const bestBuy = this._bestBuyers.get(key);
             if (!bestBuy || bestBuy.pricePerUnit === value.pricePerUnit) return;
 
+            const profitPerItem = value.pricePerUnit - bestBuy.pricePerUnit;
             worstProfit.push({
                 symbol: key,
                 buy: bestBuy,
                 sell: value,
-                profitPerItem: value.pricePerUnit - bestBuy.pricePerUnit,
-                profitPerItemPercentage: Number(((value.pricePerUnit - bestBuy.pricePerUnit) / bestBuy.pricePerUnit * 100).toFixed(0)),
-                profitPerThousandDollars: Math.round((1000 / bestBuy.pricePerUnit) * (value.pricePerUnit - bestBuy.pricePerUnit)),
+                profitPerItem,
+                profitPerVolume: Math.floor(profitPerItem / value.volumePerUnit),
+                profitPerItemPercentage: Number((profitPerItem / bestBuy.pricePerUnit * 100).toFixed(0)),
+                profitPerThousandDollars: Math.round((1000 / bestBuy.pricePerUnit) * profitPerItem),
                 distance: Math.floor(distance(bestBuy.location, value.location))
             });
         });
@@ -126,6 +135,7 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
 
                 bestSellers.set(product.symbol, {
                     pricePerUnit: product.pricePerUnit,
+                    volumePerUnit: product.volumePerUnit,
                     available: product.quantityAvailable,
                     location: {
                         symbol: planet.symbol,
@@ -154,6 +164,7 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
 
                 bestBuyer.set(product.symbol, {
                     pricePerUnit: product.pricePerUnit,
+                    volumePerUnit: product.volumePerUnit,
                     available: product.quantityAvailable,
                     location: {
                         symbol: planet.symbol,
