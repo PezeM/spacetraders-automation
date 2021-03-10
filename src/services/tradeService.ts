@@ -1,6 +1,5 @@
 import {IGame} from "../types/game.interface";
 import {remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
-import {GoodType} from "spacetraders-api-sdk";
 import {Ship} from "../models/ship";
 import logger from "../logger";
 import {ITradeData} from "../types/config.interface";

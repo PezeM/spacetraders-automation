@@ -90,5 +90,15 @@ export class Game implements IGame {
 
             await buyShip(this, ship.purchaseLocations[0].location, ship.type);
         }
+
+        // Synchronize api
+        try {
+            const response = await API.user.getUser(this._token, this._username);
+            if (response) {
+                this.state.userState.updateData(response.user);
+            }
+        } catch (e) {
+            console.error(`Couldn't synchronize user state with server`, e);
+        }
     }
 }
