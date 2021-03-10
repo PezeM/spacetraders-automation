@@ -80,15 +80,14 @@ export class Game implements IGame {
 
             await this.state.shipShopState.isInitialized;
             const ship = this.state.shipShopState.data.find(s => s.type === shipToBuy);
-            if (!ship) {
+            if (ship) {
+                const shipPrice = ship.purchaseLocations[0].price;
+                if (this.state.userState.data.credits - shipPrice > minMoneyLeft) {
+                    await buyShip(this, ship.purchaseLocations[0].location, ship.type);
+                }
+            } else {
                 logger.warn(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`)
-                return;
             }
-
-            const shipPrice = ship.purchaseLocations[0].price;
-            if (this.state.userState.data.credits - shipPrice < minMoneyLeft) return;
-
-            await buyShip(this, ship.purchaseLocations[0].location, ship.type);
         }
 
         // Synchronize api

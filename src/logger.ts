@@ -31,6 +31,13 @@ const logger = winston.createLogger({
             maxFiles: "7d",
             filename: `${CONFIG.get('logsDir')}/log-%DATE%.log`,
         }),
+        new DailyRotateFile({
+            level: 'warn',
+            handleExceptions: true,
+            maxSize: "20m",
+            maxFiles: "7d",
+            filename: `${CONFIG.get('logsDir')}/error-log-%DATE%.log`,
+        }),
         new winston.transports.Console({
             format: format.combine(
                 format.splat(),
