@@ -41,8 +41,8 @@ export class ShipActionService {
         const item = marketplaceData.marketplace.find(m => m.symbol === goodType);
         if (!item) return;
 
-        const creditsCanAfford = this._game.state.userState.data.credits / item.pricePerUnit;
-        const spaceCanAfford = ship.spaceAvailable / item.volumePerUnit;
+        const creditsCanAfford = Math.floor(this._game.state.userState.data.credits / item.pricePerUnit);
+        const spaceCanAfford = Math.floor(ship.spaceAvailable / item.volumePerUnit);
         const toBuy = Math.floor(Math.min(creditsCanAfford, spaceCanAfford, item.quantityAvailable, amount));
 
         if (isNaN(toBuy) || toBuy <= 0) return;
@@ -52,7 +52,6 @@ export class ShipActionService {
     async buyGood(ship: Ship, goodType: GoodType, amount: number) {
         const response = await API.user.buyGood(this._game.token, this._game.username, ship.id, amount, goodType);
         this._game.state.userState.updateData(response);
-        logger.info('Buy order', {order: response.order});
         const order = response?.order?.find(o => o.good === goodType);
         if (!order) return;
         logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
@@ -62,7 +61,6 @@ export class ShipActionService {
         if (amount <= 0) return;
         const response = await API.user.sellGood(this._game.token, this._game.username, ship.id, amount, goodType);
         this._game.state.userState.updateData(response);
-        logger.info('Sell order', {order: response.order});
         const order = response?.order?.find(o => o.good === goodType);
         if (!order) return;
         logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
