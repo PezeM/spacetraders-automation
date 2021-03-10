@@ -1,51 +1,68 @@
 import {IGame} from "../types/game.interface";
-import {shipCargoQuantity} from "../utils/ship";
+import {remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
 import {GoodType} from "spacetraders-api-sdk";
 import {Ship} from "../models/ship";
-import {API} from "../API";
 import logger from "../logger";
+import {ITradeData} from "../types/config.interface";
+import {wait} from "../utils/general";
+import {CONFIG} from "../config";
+import {getBestTrade} from "../utils/trade";
+import {ShipActionService} from "./shipActionService";
 
 export class TradeService {
+    private readonly _shipActionService: ShipActionService;
+
     constructor(private _game: IGame) {
-
+        this._shipActionService = new ShipActionService(this._game);
     }
 
-    async refuel(ship: Ship, wantedFuel: number = 15) {
-        const fuelInCargo = shipCargoQuantity(ship, GoodType.FUEL);
-        const neededFuel = wantedFuel - fuelInCargo;
-        if (neededFuel <= 0) return;
+    async tradeLoop(ships: Ship[]) {
+        const trade = getBestTrade(this._game.state.marketplaceState, CONFIG.get('strategy'));
 
-        await this.buy(ship, GoodType.FUEL, neededFuel);
+        for (const ship of ships) {
+            if (ship.isBusy) continue;
+            this.trade(ship, trade);
+            await wait(1000);
+        }
     }
 
-    async buy(ship: Ship, goodType: GoodType, amount: number) {
-        const marketplaceData = await this._game.state.marketplaceState.getOrCreateMarketplaceData(ship.location, this._game.token);
-        if (!marketplaceData) return;
-        const item = marketplaceData.find(m => m.symbol === goodType);
-        if (!item) return;
+    async trade(ship: Ship, trade: ITradeData) {
+        if (ship.isBusy) return;
 
-        const creditsCanAfford = this._game.state.userState.data.credits / item.pricePerUnit;
-        const spaceCanAfford = ship.spaceAvailable / item.volumePerUnit;
-        const toBuy = Math.floor(Math.min(creditsCanAfford, spaceCanAfford, item.quantityAvailable, amount));
+        if (!ship.location) {
+            logger.warn(`Ship ${ship.id} doesn't have location set`);
+            return;
+        }
 
-        if (isNaN(toBuy) || toBuy <= 0) return;
-        await this.buyGood(ship, goodType, toBuy);
-    }
+        ship.isBusy = true;
 
-    async buyGood(ship: Ship, goodType: GoodType, amount: number) {
-        const response = await API.user.buyGood(this._game.token, this._game.username, ship.id, amount, goodType);
-        this._game.state.userState.updateData(response);
-        const order = response?.order?.find(o => o.good === goodType);
-        if (!order) return;
-        logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
-    }
+        try {
+            // Buy
+            // Fly to buy location
+            const goods = shipCargoQuantity(ship, trade.itemToTrade);
+            if (!goods) {
+                // Refuel
+                await this._shipActionService.refuel(ship);
 
-    async sell(ship: Ship, goodType: GoodType, amount: number) {
-        if (amount <= 0) return;
-        const response = await API.user.sellGood(this._game.token, this._game.username, ship.id, amount, goodType);
-        this._game.state.userState.updateData(response);
-        const order = response?.order?.find(o => o.good === goodType);
-        if (!order) return;
-        logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
+                await this._shipActionService.fly(ship, trade.source);
+                await this._shipActionService.buy(ship, trade.itemToTrade, remainingCargoSpace(ship));
+            }
+
+            // Fly to sell location
+            // Sell
+            // Refuel
+            await this._shipActionService.fly(ship, trade.destination);
+            const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
+            await this._shipActionService.sell(ship, trade.itemToTrade, toSellAmount);
+            await this._shipActionService.refuel(ship);
+            // End
+
+            logger.info(this._game.state.userState.toString());
+        } catch (e) {
+            logger.error(`Error while trading with ship ${ship.id}`, e);
+            ship.isTraveling = false;
+        }
+
+        ship.isBusy = false;
     }
 }

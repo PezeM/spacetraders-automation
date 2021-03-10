@@ -16,6 +16,8 @@ class MarketplaceService implements IInitializeable {
         // Interval to refresh marketplace
         if (this._isInitialized) return;
 
+        if (!CONFIG.has('shipsToScrapMarket')) return;
+
         this.fetchMarketplace(game);
         this._timer = setInterval(this.fetchMarketplace.bind(this, game), CONFIG.get('marketplaceRefreshTimer'));
         this._isInitialized = true;
@@ -23,6 +25,9 @@ class MarketplaceService implements IInitializeable {
 
     private async fetchMarketplace(game: IGame) {
         if (this._isTimerRunning) return;
+        const shipsToScrapMarket = CONFIG.get('shipsToScrapMarket');
+        if (!shipsToScrapMarket || shipsToScrapMarket <= 0) return;
+
         this._isTimerRunning = true;
         logger.info('Fetching marketplace');
 

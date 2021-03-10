@@ -1,10 +1,11 @@
 import {BaseState} from "./baseState";
 import {IGame, MarketplaceSeller} from "../types/game.interface";
-import {GoodType, Marketplace, PlanetMarketplace} from "spacetraders-api-sdk";
+import {GoodType, PlanetMarketplace} from "spacetraders-api-sdk";
 import {MarketplaceProfit} from "../types/marketplace.interface";
 import {distance} from "../utils/math";
 import {API} from "../API";
 import {MarketplaceProfitType} from "../types/marketplace.type";
+import {TradeStrategy} from "../types/enums/trade.enum";
 
 export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -20,20 +21,8 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
         this._worstProfit = [];
     }
 
-    get bestSellers() {
-        return this._bestSellers;
-    }
-
-    get bestBuyers() {
-        return this._bestBuyers;
-    }
-
     get bestProfit() {
         return this._bestProfit;
-    }
-
-    get worstProfit() {
-        return this._worstProfit;
     }
 
     async initializeState(): Promise<void> {
@@ -41,16 +30,15 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     }
 
     getMarketplaceData(symbol: string) {
-        return this._data.find(m => m.symbol === symbol)?.marketplace;
+        return this._data.find(m => m.symbol === symbol);
     }
 
-    async getOrCreateMarketplaceData(location: string, token: string): Promise<Marketplace[]> {
+    async getOrCreatePlanetMarketplace(location: string, token: string): Promise<PlanetMarketplace> {
         let marketplace = this.getMarketplaceData(location);
         if (marketplace) return marketplace;
 
         const marketplaceResponse = await API.game.getLocationMarketplace(token, location);
-        this.addMarketplaceData(marketplaceResponse.planet);
-        return marketplaceResponse.planet.marketplace;
+        return this.addMarketplaceData(marketplaceResponse.planet);
     }
 
     addMarketplaceData(planetMarketplace: PlanetMarketplace) {
@@ -65,10 +53,17 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
         this.computeBestSellers();
         this.computeBestProfit();
         this.computeLeastProfitable();
+
+        return planetMarketplace;
     }
 
-    getBestProfitBy(sortedBy: MarketplaceProfitType) {
-        return this._bestProfit.sort((a, b) => b[sortedBy] - a[sortedBy]);
+    getTradesBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit) {
+        let source = strategy === TradeStrategy.Profit ? this._bestProfit : this._worstProfit;
+        return source.sort((a, b) => b[sortedBy] - a[sortedBy]);
+    }
+
+    getBestTradeBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit) {
+        return this.getTradesBy(sortedBy, strategy)[0];
     }
 
     computeBestProfit() {

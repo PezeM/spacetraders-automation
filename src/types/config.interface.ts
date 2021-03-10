@@ -1,13 +1,15 @@
-import {ConfigStrategy} from "./enums/config.enum";
 import {GoodType} from "spacetraders-api-sdk";
+import {MarketplaceProfitType} from "./marketplace.type";
+import {TradeStrategy} from "./enums/trade.enum";
 
 export interface IConfig {
     logsDir: string;
     username: string;
     token: string;
-    strategy: ConfigStrategy;
+    strategy: TradeStrategy;
     shipsToScrapMarket: number | "MAX";
     marketplaceRefreshTimer: number;
+    sortProfitBy: MarketplaceProfitType;
     defaultTrade?: ITradeData;
     shipToBuy?: string;
     minMoneyLeftAfterBuyingShip: number;

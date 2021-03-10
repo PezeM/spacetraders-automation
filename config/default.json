@@ -5,11 +5,12 @@
   "strategy": "PROFIT",
   "shipsToScrapMarket": "1",
   "marketplaceRefreshTimer": "5000000",
+  "sortProfitBy": "profitPerVolume",
   "defaultTrade": {
     "source": "OE-PM",
     "destination": "OE-PM-TR",
     "itemToTrade": "SHIP_PLATING"
   },
   "shipToBuy": "GR-MK-I",
-  "minMoneyLeftAfterBuyingShip": 10000
+  "minMoneyLeftAfterBuyingShip": 100000
 }

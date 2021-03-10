@@ -1,4 +1,4 @@
-export enum ConfigStrategy {
+export enum TradeStrategy {
     Profit = 'PROFIT',
     Loss = 'LOSS'
 }

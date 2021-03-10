@@ -10,24 +10,25 @@ export const wait = (time: number) => new Promise(r => setTimeout(r, time));
  * Waits for function to complete and return true
  * @param func
  * @param timeout
+ * @param interval
  */
-export const waitFor = (func: () => boolean, timeout?: number) => {
+export const waitFor = (func: () => boolean, timeout?: number, interval: number = 50) => {
     return new Promise((resolve, reject) => {
         try {
             let timeoutTimer: Timeout | undefined;
 
             const clearTimers = () => {
-                clearInterval(interval);
+                clearInterval(intervalId);
                 if (timeoutTimer) clearTimeout(timeoutTimer);
             };
 
-            let interval = setInterval(() => {
+            let intervalId = setInterval(() => {
                 if (func()) {
                     clearTimers();
                     resolve(true);
                     return;
                 }
-            }, 10);
+            }, interval);
 
             if (timeout) {
                 timeoutTimer = setTimeout(() => {
