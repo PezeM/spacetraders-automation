@@ -59,7 +59,7 @@ export class Game implements IGame {
 
         // There should be fetch for best trades
         for (const ship of ships) {
-            if (ship.isBusy) return;
+            if (ship.isBusy) continue;
             this.trade(ship);
         }
     }
@@ -91,7 +91,7 @@ export class Game implements IGame {
 
         ship.isBusy = true;
 
-        const refuel = async (wantedFuel: number = 15) => {
+        const refuel = async (wantedFuel: number = 20) => {
             const fuelInCargo = shipCargoQuantity(ship, GoodType.FUEL);
             const neededFuel = wantedFuel - fuelInCargo;
             if (neededFuel <= 0) return;
