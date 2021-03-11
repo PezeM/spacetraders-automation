@@ -26,12 +26,7 @@ export class TradeService {
     }
 
     async trade(ship: Ship, trade: ITradeData) {
-        if (ship.isBusy) return;
-
-        if (!ship.location) {
-            logger.warn(`Ship ${ship.id} doesn't have location set`);
-            return;
-        }
+        if (ship.isBusy || !ship.location) return;
 
         ship.isBusy = true;
 
