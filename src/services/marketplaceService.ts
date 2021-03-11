@@ -1,9 +1,7 @@
 import {IGame} from "../types/game.interface";
 import {CONFIG} from "../config";
-import {buyShip, getCheapestShip, getScoutShipId, remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
+import {buyShip, getCheapestShip, getScoutShipId} from "../utils/ship";
 import {API} from "../API";
-import {GoodType} from "spacetraders-api-sdk";
-import {wait} from "../utils/general";
 import {IInitializeable} from "../types/initializeable.interface";
 import logger from "../logger";
 import {ShipActionService} from "./shipActionService";

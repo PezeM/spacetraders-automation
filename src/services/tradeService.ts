@@ -1,5 +1,5 @@
 import {IGame} from "../types/game.interface";
-import {getCargoOfTypes, remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
+import {filterShipCargos, remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
 import {Ship} from "../models/ship";
 import logger from "../logger";
 import {ITradeData} from "../types/config.interface";
@@ -33,7 +33,7 @@ export class TradeService {
 
         try {
             if (CONFIG.get('sellNotUsedCargo')) {
-                const extraCargo = getCargoOfTypes(ship, [trade.itemToTrade, GoodType.FUEL]);
+                const extraCargo = filterShipCargos(ship, [trade.itemToTrade, GoodType.FUEL]);
                 if (extraCargo && extraCargo.length > 0) {
                     await this.sellNotUsedCargo(ship, extraCargo);
                 }

@@ -11,7 +11,7 @@ export class ShipActionService {
 
     }
 
-    async refuel(ship: Ship, wantedFuel: number = 15) {
+    async refuel(ship: Ship, wantedFuel: number = 25) {
         const fuelInCargo = shipCargoQuantity(ship, GoodType.FUEL);
         const neededFuel = wantedFuel - fuelInCargo;
         if (neededFuel <= 0) return;

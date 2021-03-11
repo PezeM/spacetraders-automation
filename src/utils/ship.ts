@@ -72,6 +72,6 @@ export const isValidCargo = (input: any): input is Cargo => {
     return missingProperties.length === 0;
 }
 
-export const getCargoOfTypes = (ship: UserShip, goods: GoodType[]) => {
-    return ship.cargo.filter(c => goods.includes(c.good));
+export const filterShipCargos = (ship: UserShip, goods: GoodType[]) => {
+    return ship.cargo.filter(c => !goods.includes(c.good));
 }
