@@ -62,6 +62,7 @@ class MarketplaceService implements IInitializeable {
                 ship.isBusy = false;
             }
 
+            ship.isTraveling = false;
             ship.isBusy = false;
         }
 

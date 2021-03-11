@@ -5,7 +5,6 @@ export interface MarketplaceProfitPer {
     profitPerItem: number;
     profitPerVolume: number;
     profitPerItemPercentage: number;
-    profitPerThousandDollars: number;
 }
 
 export interface MarketplaceProfit extends MarketplaceProfitPer {
@@ -13,4 +12,7 @@ export interface MarketplaceProfit extends MarketplaceProfitPer {
     buy: MarketplaceSeller;
     sell: MarketplaceSeller;
     distance: number;
+    gainPerItem: number;
+    gainPerVolume: number;
+    gainPerItemPercentage: number;
 }

@@ -1,0 +1,1 @@
+export const PROFIT_DIST_MULT = 0.5;

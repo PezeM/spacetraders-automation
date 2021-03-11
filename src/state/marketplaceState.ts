@@ -7,6 +7,7 @@ import {API} from "../API";
 import {MarketplaceProfitType} from "../types/marketplace.type";
 import {TradeStrategy} from "../types/enums/trade.enum";
 import logger from "../logger";
+import {PROFIT_DIST_MULT} from "../constants/profit";
 
 export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -75,24 +76,29 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
             const bestSell = this._bestSellers.get(key);
             if (!bestSell || bestSell.pricePerUnit === value.pricePerUnit) return;
 
-            const profitPerItem = bestSell.pricePerUnit - value.pricePerUnit;
-            const dist = distance(value.location, bestSell.location);
+            const gainPerItem = bestSell.pricePerUnit - value.pricePerUnit;
+            const dist = Math.round(distance(value.location, bestSell.location));
+            const distFactor = dist * PROFIT_DIST_MULT;
 
-            // TODO: Calculate profit based on distance, distance ranges between 4 - 100, need to calculate time by that
+            const profit = {
+                gainPerItem: gainPerItem,
+                gainPerVolume: Math.floor(gainPerItem / (!value.volumePerUnit ? 1 : value.volumePerUnit)),
+                gainPerItemPercentage: Number((gainPerItem / value.pricePerUnit * 100).toFixed(0))
+            }
 
             bestProfit.push({
                 symbol: key,
                 buy: value,
                 sell: bestSell,
-                profitPerItem,
-                profitPerVolume: Math.floor(profitPerItem / (!value.volumePerUnit ? 1 : value.volumePerUnit)),
-                profitPerItemPercentage: Number((profitPerItem / value.pricePerUnit * 100).toFixed(0)),
-                profitPerThousandDollars: Math.round((1000 / value.pricePerUnit) * profitPerItem),
-                distance: dist
+                profitPerItem: profit.gainPerItem / distFactor,
+                profitPerVolume: profit.gainPerVolume / distFactor,
+                profitPerItemPercentage: profit.gainPerItemPercentage / distFactor,
+                distance: dist,
+                ...profit
             });
         });
 
-        this._bestProfit = bestProfit.sort((a, b) => b.profitPerItemPercentage - a.profitPerItemPercentage);
+        this._bestProfit = bestProfit.sort((a, b) => b.profitPerVolume - a.profitPerVolume);
         this._isInitialized = new Promise(r => r(true));
         logger.debug(`Most profitable trades`, {bestProfit: this._bestProfit})
         return this._bestProfit;
@@ -105,20 +111,29 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
             const bestBuy = this._bestBuyers.get(key);
             if (!bestBuy || bestBuy.pricePerUnit === value.pricePerUnit) return;
 
-            const profitPerItem = value.pricePerUnit - bestBuy.pricePerUnit;
+            const gainPerItem = value.pricePerUnit - bestBuy.pricePerUnit;
+            const dist = Math.round(distance(value.location, bestBuy.location));
+            const distFactor = dist * PROFIT_DIST_MULT;
+
+            const profit = {
+                gainPerItem: gainPerItem,
+                gainPerVolume: Math.floor(gainPerItem / (!value.volumePerUnit ? 1 : value.volumePerUnit)),
+                gainPerItemPercentage: Number((gainPerItem / bestBuy.pricePerUnit * 100).toFixed(0))
+            }
+
             worstProfit.push({
                 symbol: key,
                 buy: bestBuy,
                 sell: value,
-                profitPerItem,
-                profitPerVolume: Math.floor(profitPerItem / value.volumePerUnit ?? 1),
-                profitPerItemPercentage: Number((profitPerItem / bestBuy.pricePerUnit * 100).toFixed(0)),
-                profitPerThousandDollars: Math.round((1000 / bestBuy.pricePerUnit) * profitPerItem),
-                distance: Math.floor(distance(bestBuy.location, value.location))
+                profitPerItem: profit.gainPerItem / distFactor,
+                profitPerVolume: profit.gainPerVolume / distFactor,
+                profitPerItemPercentage: profit.gainPerItemPercentage / distFactor,
+                distance: dist,
+                ...profit
             });
         });
 
-        this._worstProfit = worstProfit.sort((a, b) => a.profitPerItemPercentage - b.profitPerItemPercentage);
+        this._worstProfit = worstProfit.sort((a, b) => a.profitPerVolume - b.profitPerVolume);
         this._isInitialized = new Promise(r => r(true));
         return this._worstProfit;
     }
