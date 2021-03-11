@@ -6,6 +6,7 @@ import {distance} from "../utils/math";
 import {API} from "../API";
 import {MarketplaceProfitType} from "../types/marketplace.type";
 import {TradeStrategy} from "../types/enums/trade.enum";
+import logger from "../logger";
 
 export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -33,11 +34,12 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
         return this._data.find(m => m.symbol === symbol);
     }
 
-    async getOrCreatePlanetMarketplace(location: string, token: string): Promise<PlanetMarketplace> {
+    async getOrCreatePlanetMarketplace(location: string): Promise<PlanetMarketplace> {
+        // TODO: Cache result for given time
         let marketplace = this.getMarketplaceData(location);
         if (marketplace) return marketplace;
 
-        const marketplaceResponse = await API.game.getLocationMarketplace(token, location);
+        const marketplaceResponse = await API.game.getLocationMarketplace(location);
         return this.addMarketplaceData(marketplaceResponse.planet);
     }
 
@@ -74,21 +76,25 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
             if (!bestSell || bestSell.pricePerUnit === value.pricePerUnit) return;
 
             const profitPerItem = bestSell.pricePerUnit - value.pricePerUnit;
+            const dist = distance(value.location, bestSell.location);
+
+            // TODO: Calculate profit based on distance, distance ranges between 4 - 100, need to calculate time by that
+
             bestProfit.push({
                 symbol: key,
                 buy: value,
                 sell: bestSell,
                 profitPerItem,
-                profitPerVolume: Math.floor(profitPerItem / value.volumePerUnit),
+                profitPerVolume: Math.floor(profitPerItem / (!value.volumePerUnit ? 1 : value.volumePerUnit)),
                 profitPerItemPercentage: Number((profitPerItem / value.pricePerUnit * 100).toFixed(0)),
                 profitPerThousandDollars: Math.round((1000 / value.pricePerUnit) * profitPerItem),
-                distance: Math.floor(distance(value.location, bestSell.location))
+                distance: dist
             });
         });
 
-        bestProfit.sort((a, b) => b.profitPerItemPercentage - a.profitPerItemPercentage);
-        this._bestProfit = bestProfit;
+        this._bestProfit = bestProfit.sort((a, b) => b.profitPerItemPercentage - a.profitPerItemPercentage);
         this._isInitialized = new Promise(r => r(true));
+        logger.debug(`Most profitable trades`, {bestProfit: this._bestProfit})
         return this._bestProfit;
     }
 
@@ -105,15 +111,14 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
                 buy: bestBuy,
                 sell: value,
                 profitPerItem,
-                profitPerVolume: Math.floor(profitPerItem / value.volumePerUnit),
+                profitPerVolume: Math.floor(profitPerItem / value.volumePerUnit ?? 1),
                 profitPerItemPercentage: Number((profitPerItem / bestBuy.pricePerUnit * 100).toFixed(0)),
                 profitPerThousandDollars: Math.round((1000 / bestBuy.pricePerUnit) * profitPerItem),
                 distance: Math.floor(distance(bestBuy.location, value.location))
             });
         });
 
-        worstProfit.sort((a, b) => a.profitPerItemPercentage - b.profitPerItemPercentage);
-        this._worstProfit = worstProfit;
+        this._worstProfit = worstProfit.sort((a, b) => a.profitPerItemPercentage - b.profitPerItemPercentage);
         this._isInitialized = new Promise(r => r(true));
         return this._worstProfit;
     }

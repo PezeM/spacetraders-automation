@@ -11,7 +11,7 @@ export class UserStartupService {
 
         if (userState.data.ships.length < 2) {
             while (userState.data.ships.length < 2) {
-                await buyShip(game, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
+                await buyShip(userState, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
             }
         }
     }
@@ -19,10 +19,9 @@ export class UserStartupService {
     /**
      * Checks if user with given username exists. Throw error if it doesn't
      * @param username
-     * @param token
      */
-    public async throwIfUserDoesntExist(username: string, token: string) {
-        const result = await API.user.getUser(token, username);
+    public async throwIfUserDoesntExist(username: string) {
+        const result = await API.user.getUser();
         if (!result) throw new Error(`User with username ${username} doesnt exists.`);
     }
 }

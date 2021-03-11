@@ -34,10 +34,10 @@ class MarketplaceService implements IInitializeable {
         const {locationState, userState, marketplaceState} = game.state;
 
         // Get scout ship id, if no scout ship then buy one
-        let shipId = getScoutShipId(game);
+        let shipId = getScoutShipId(game.state);
         if (!shipId) {
             const cheapestShip = getCheapestShip(game.state.shipShopState.data);
-            const newShip = await buyShip(game, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
+            const newShip = await buyShip(game.state.userState, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
             shipId = newShip.id;
         }
 
@@ -46,18 +46,19 @@ class MarketplaceService implements IInitializeable {
 
             let ship = userState.getShipById(shipId);
             ship.isScoutShip = true;
+            ship.isBusy = true;
             try {
                 if (shipCargoQuantity(ship, GoodType.FUEL) < 50) {
                     // Refill fuel
                     const refuelAmount = Math.min(remainingCargoSpace(ship), 50 - shipCargoQuantity(ship, GoodType.FUEL));
-                    const result = await API.user.buyGood(game.token, game.username, ship.id, refuelAmount, GoodType.FUEL);
+                    const result = await API.user.buyGood(ship.id, refuelAmount, GoodType.FUEL);
                     userState.updateData(result);
                 }
 
                 ship = userState.getShipById(shipId);
                 if (ship.location !== location.symbol) {
                     // Fly to given location
-                    const flyInfo = await API.user.createFlightPlan(game.token, game.username, ship.id, location.symbol);
+                    const flyInfo = await API.user.createFlightPlan(ship.id, location.symbol);
                     await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 1000);
 
                     const remainingFuel = flyInfo.flightPlan.fuelRemaining;
@@ -65,13 +66,16 @@ class MarketplaceService implements IInitializeable {
                 }
 
                 // Get marketplace data
-                const marketplaceResponse = await API.game.getLocationMarketplace(game.token, location.symbol);
+                const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
                 marketplaceState.addMarketplaceData(marketplaceResponse.planet);
                 logger.debug(`Fetched marketplace location from planet ${location.symbol}`);
                 logger.debug('Most profitable', {mostProfitable: marketplaceState.bestProfit});
             } catch (e) {
                 logger.error(`Couldn't get marketplace data`, e);
+                ship.isBusy = false;
             }
+
+            ship.isBusy = false;
         }
 
         logger.info('Fetched all marketplace data');

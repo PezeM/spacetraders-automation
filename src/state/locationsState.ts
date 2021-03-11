@@ -25,7 +25,7 @@ export class LocationsState extends BaseState<Location[]> {
 
     public async fetchLocationsInSystem(): Promise<void> {
         for (const symbol of LOCATION_SYMBOLS) {
-            const locations = await API.game.getLocations(this._game.token, symbol);
+            const locations = await API.game.getLocations(symbol);
             if (!locations || locations.locations?.length === 0) continue;
 
             for (const location of locations.locations) {

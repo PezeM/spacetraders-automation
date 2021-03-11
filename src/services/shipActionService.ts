@@ -1,13 +1,13 @@
-import {IGame} from "../types/game.interface";
 import {Ship} from "../models/ship";
 import {API} from "../API";
 import logger from "../logger";
 import {wait} from "../utils/general";
 import {GoodType} from "spacetraders-api-sdk";
 import {shipCargoQuantity} from "../utils/ship";
+import {GameState} from "../state/gameState";
 
 export class ShipActionService {
-    constructor(private _game: IGame) {
+    constructor(private _state: GameState) {
 
     }
 
@@ -23,7 +23,7 @@ export class ShipActionService {
         if (!ship.location || ship.location === destination) return;
         ship.isTraveling = true;
 
-        const flyInfo = await API.user.createFlightPlan(this._game.token, this._game.username, ship.id, destination);
+        const flyInfo = await API.user.createFlightPlan(ship.id, destination);
         logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
         await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
         logger.info(`Ship ${ship.id} arrived at ${destination}`);
@@ -34,14 +34,13 @@ export class ShipActionService {
         ship.isTraveling = false;
     }
 
-
     async buy(ship: Ship, goodType: GoodType, amount: number) {
-        const marketplaceData = await this._game.state.marketplaceState.getOrCreatePlanetMarketplace(ship.location, this._game.token);
+        const marketplaceData = await this._state.marketplaceState.getOrCreatePlanetMarketplace(ship.location);
         if (!marketplaceData || ship.location !== marketplaceData.symbol) return;
         const item = marketplaceData.marketplace.find(m => m.symbol === goodType);
         if (!item) return;
 
-        const creditsCanAfford = Math.floor(this._game.state.userState.data.credits / item.pricePerUnit);
+        const creditsCanAfford = Math.floor(this._state.userState.data.credits / item.pricePerUnit);
         const spaceCanAfford = Math.floor(ship.spaceAvailable / item.volumePerUnit);
         const toBuy = Math.floor(Math.min(creditsCanAfford, spaceCanAfford, item.quantityAvailable, amount));
 
@@ -50,8 +49,8 @@ export class ShipActionService {
     }
 
     async buyGood(ship: Ship, goodType: GoodType, amount: number) {
-        const response = await API.user.buyGood(this._game.token, this._game.username, ship.id, amount, goodType);
-        this._game.state.userState.updateData(response);
+        const response = await API.user.buyGood(ship.id, amount, goodType);
+        this._state.userState.updateData(response);
         const order = response?.order?.find(o => o.good === goodType);
         if (!order) return;
         logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
@@ -59,8 +58,8 @@ export class ShipActionService {
 
     async sell(ship: Ship, goodType: GoodType, amount: number) {
         if (amount <= 0) return;
-        const response = await API.user.sellGood(this._game.token, this._game.username, ship.id, amount, goodType);
-        this._game.state.userState.updateData(response);
+        const response = await API.user.sellGood(ship.id, amount, goodType);
+        this._state.userState.updateData(response);
         const order = response?.order?.find(o => o.good === goodType);
         if (!order) return;
         logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);

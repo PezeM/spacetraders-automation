@@ -1,14 +1,11 @@
 import {IGame} from "./types/game.interface";
 import {GameState} from "./state/gameState";
 import {API} from "./API";
-import {buyShip, remainingCargoSpace, shipCargoQuantity} from "./utils/ship";
-import {wait, waitFor} from "./utils/general";
+import {buyShip} from "./utils/ship";
+import {waitFor} from "./utils/general";
 import {UserStartupService} from "./services/userStartupService";
-import {Ship} from "./models/ship";
-import {GoodType} from "spacetraders-api-sdk";
 import {CONFIG} from "./config";
 import logger from "./logger";
-import {ITradeData} from "./types/config.interface";
 import {marketplaceService} from "./services/marketplaceService";
 import {TradeService} from "./services/tradeService";
 
@@ -30,8 +27,9 @@ export class Game implements IGame {
                     process.exit(0);
                 }
 
+                API.initialize(this._username, this._token);
                 logger.debug('Spacetraders server is available')
-                await new UserStartupService().throwIfUserDoesntExist(this._username, this._token);
+                await new UserStartupService().throwIfUserDoesntExist(this._username);
                 await this.state.initializeStates();
 
                 logger.info('Start user state', {userState: this.state.userState.data});
@@ -71,6 +69,8 @@ export class Game implements IGame {
     }
 
     private utilityLoop = async () => {
+        const {userState, shipShopState} = this.state;
+
         // Buy ship
         if (CONFIG.has('shipToBuy')) {
             const shipToBuy = CONFIG.get('shipToBuy');
@@ -78,12 +78,12 @@ export class Game implements IGame {
             let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
             if (!minMoneyLeft || isNaN(minMoneyLeft)) return;
 
-            await this.state.shipShopState.isInitialized;
-            const ship = this.state.shipShopState.data.find(s => s.type === shipToBuy);
+            await shipShopState.isInitialized;
+            const ship = shipShopState.data.find(s => s.type === shipToBuy);
             if (ship) {
                 const shipPrice = ship.purchaseLocations[0].price;
-                if (this.state.userState.data.credits - shipPrice > minMoneyLeft) {
-                    await buyShip(this, ship.purchaseLocations[0].location, ship.type);
+                if (userState.data.credits - shipPrice > minMoneyLeft) {
+                    await buyShip(userState, ship.purchaseLocations[0].location, ship.type);
                 }
             } else {
                 logger.warn(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`)
@@ -92,9 +92,9 @@ export class Game implements IGame {
 
         // Synchronize api
         try {
-            const response = await API.user.getUser(this._token, this._username);
+            const response = await API.user.getUser();
             if (response) {
-                this.state.userState.updateData(response.user);
+                userState.updateData(response.user);
             }
         } catch (e) {
             console.error(`Couldn't synchronize user state with server`, e);

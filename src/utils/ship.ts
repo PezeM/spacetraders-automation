@@ -1,8 +1,9 @@
 import {Cargo, GoodType, ShopShip, UserShip} from "spacetraders-api-sdk";
 import {CheapestShip} from "../types/ship.type";
 import {API} from "../API";
-import {IGame} from "../types/game.interface";
 import logger from "../logger";
+import {UserState} from "../state/userState";
+import {GameState} from "../state/gameState";
 
 /**
  * Returns cheapest ship from ships list
@@ -29,16 +30,16 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
     return {ship: ships[0], purchaseLocation: ships[0].purchaseLocations[0]}
 }
 
-export const buyShip = async (game: IGame, location: string, shipType: string): Promise<UserShip> => {
+export const buyShip = async (userState: UserState, location: string, shipType: string): Promise<UserShip> => {
     try {
-        const result = await API.user.buyShip(game.token, game.username, location, shipType);
+        const result = await API.user.buyShip(location, shipType);
         const newShip = result.user.ships[result.user.ships.length - 1];
         logger.info(`Bought new ship ${shipType} ${newShip.id}`, {shipId: newShip.id});
-        game.state.userState.updateData(result.user);
-        logger.info(game.state.userState.toString());
+        userState.updateData(result.user);
+        logger.info(userState.toString());
         return newShip;
     } catch (e) {
-        logger.error(`Couldn't buy ship type ${shipType}. Remaining credit ${game.state.userState.data.credits}`);
+        logger.error(`Couldn't buy ship type ${shipType}. Remaining credit ${userState.data.credits}`);
         throw e;
     }
 }
@@ -46,8 +47,8 @@ export const buyShip = async (game: IGame, location: string, shipType: string): 
 export const remainingCargoSpace = (ship: UserShip): number => ship.maxCargo - ship.cargo.reduce((p, c) => p + c.totalVolume, 0);
 export const shipCargoQuantity = (ship: UserShip, good: GoodType): number => ship.cargo.find(c => c.good === good)?.quantity ?? 0;
 
-export const getScoutShipId = (game: IGame, isTraveling = false): string | undefined => {
-    const {userState, shipShopState} = game.state;
+export const getScoutShipId = (state: GameState, isTraveling = false): string | undefined => {
+    const {userState, shipShopState} = state;
     let ship = userState.data.ships.find(s => s.isScoutShip && s.isTraveling === isTraveling);
     if (ship) return ship.id;
 

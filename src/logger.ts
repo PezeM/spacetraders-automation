@@ -1,4 +1,4 @@
-import winston, {format, transports} from "winston";
+import winston, {format} from "winston";
 import {CONFIG} from "./config";
 import * as fs from "fs";
 import DailyRotateFile from "winston-daily-rotate-file";
@@ -15,6 +15,7 @@ const formatter = format.printf((info) => {
 });
 
 const logger = winston.createLogger({
+    level: 'debug',
     handleExceptions: true,
     format: format.combine(
         format.splat(),
@@ -26,6 +27,7 @@ const logger = winston.createLogger({
     ),
     transports: [
         new DailyRotateFile({
+            level: 'debug',
             handleExceptions: true,
             maxSize: "20m",
             maxFiles: "7d",

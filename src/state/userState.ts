@@ -20,7 +20,7 @@ export class UserState extends BaseState<GameUser> {
         if (await this.isInitialized) return;
 
         this._isInitialized = new Promise<boolean>(async (resolve, reject) => {
-            API.user.getUser(this._game.token, this._game.username).then(user => {
+            API.user.getUser().then(user => {
                 this._data = {
                     credits: user.user.credits,
                     loans: user.user.loans,

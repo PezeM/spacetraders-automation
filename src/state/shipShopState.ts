@@ -13,7 +13,7 @@ export class ShipShopState extends BaseState<ShopShip[]> {
         if (await this.isInitialized) return;
 
         this._isInitialized = new Promise<boolean>(async (resolve, reject) => {
-            API.game.getAvailableShips(this._game.token).then(ships => {
+            API.game.getAvailableShips().then(ships => {
                 this._data = ships.ships;
 
                 logger.info(`Initialized ship shop state with ${this._data.length} ships.`);

@@ -12,7 +12,7 @@ export class TradeService {
     private readonly _shipActionService: ShipActionService;
 
     constructor(private _game: IGame) {
-        this._shipActionService = new ShipActionService(this._game);
+        this._shipActionService = new ShipActionService(this._game.state);
     }
 
     async tradeLoop(ships: Ship[]) {

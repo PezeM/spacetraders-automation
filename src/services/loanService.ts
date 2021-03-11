@@ -16,7 +16,7 @@ export class LoanService {
     async takeLoan(game: IGame, loanType = LoanType.STARTUP): Promise<boolean> {
         try {
             logger.info(`${game.username} is taking a loan of type ${loanType}`);
-            const response = await API.user.takeoutLoan(game.token, game.username, loanType);
+            const response = await API.user.requestLoan(loanType);
             game.state.userState.updateData(response.user);
             logger.info(game.state.userState.toString());
             return true;
