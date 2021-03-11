@@ -2,7 +2,7 @@ import {Ship} from "../models/ship";
 import {API} from "../API";
 import logger from "../logger";
 import {wait} from "../utils/general";
-import {GoodType} from "spacetraders-api-sdk";
+import {GoodType, UserShip} from "spacetraders-api-sdk";
 import {shipCargoQuantity} from "../utils/ship";
 import {GameState} from "../state/gameState";
 
@@ -48,7 +48,7 @@ export class ShipActionService {
         await this.buyGood(ship, goodType, toBuy);
     }
 
-    async buyGood(ship: Ship, goodType: GoodType, amount: number) {
+    async buyGood(ship: UserShip, goodType: GoodType, amount: number) {
         const response = await API.user.buyGood(ship.id, amount, goodType);
         this._state.userState.updateData(response);
         const order = response?.order?.find(o => o.good === goodType);
@@ -56,7 +56,7 @@ export class ShipActionService {
         logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
     }
 
-    async sell(ship: Ship, goodType: GoodType, amount: number) {
+    async sell(ship: UserShip, goodType: GoodType, amount: number) {
         if (amount <= 0) return;
         const response = await API.user.sellGood(ship.id, amount, goodType);
         this._state.userState.updateData(response);

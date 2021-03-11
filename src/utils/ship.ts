@@ -4,6 +4,7 @@ import {API} from "../API";
 import logger from "../logger";
 import {UserState} from "../state/userState";
 import {GameState} from "../state/gameState";
+import {Ship} from "../models/ship";
 
 /**
  * Returns cheapest ship from ships list
@@ -69,4 +70,8 @@ export const isValidCargo = (input: any): input is Cargo => {
         .map(key => new Error(`Document is missing ${key} ${schema[key]}`));
 
     return missingProperties.length === 0;
+}
+
+export const getCargoOfTypes = (ship: UserShip, goods: GoodType[]) => {
+    return ship.cargo.filter(c => goods.includes(c.good));
 }

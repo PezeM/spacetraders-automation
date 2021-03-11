@@ -12,5 +12,6 @@
     "itemToTrade": "SHIP_PLATING"
   },
   "shipToBuy": "GR-MK-I",
-  "minMoneyLeftAfterBuyingShip": 100000
+  "minMoneyLeftAfterBuyingShip": 100000,
+  "sellNotUsedCargo": true
 }

@@ -13,6 +13,7 @@ export interface IConfig {
     defaultTrade?: ITradeData;
     shipToBuy?: string;
     minMoneyLeftAfterBuyingShip: number;
+    sellNotUsedCargo: boolean;
 }
 
 export interface ITradeData {

@@ -6,6 +6,7 @@ import {GoodType} from "spacetraders-api-sdk";
 import {wait} from "../utils/general";
 import {IInitializeable} from "../types/initializeable.interface";
 import logger from "../logger";
+import {ShipActionService} from "./shipActionService";
 
 class MarketplaceService implements IInitializeable {
     private _isTimerRunning: boolean = false;
@@ -27,6 +28,7 @@ class MarketplaceService implements IInitializeable {
         if (this._isTimerRunning) return;
         const shipsToScrapMarket = CONFIG.get('shipsToScrapMarket');
         if (!shipsToScrapMarket || shipsToScrapMarket <= 0) return;
+        const shipActionService = new ShipActionService(game.state);
 
         this._isTimerRunning = true;
         logger.info('Fetching marketplace');
@@ -48,22 +50,9 @@ class MarketplaceService implements IInitializeable {
             ship.isScoutShip = true;
             ship.isBusy = true;
             try {
-                if (shipCargoQuantity(ship, GoodType.FUEL) < 50) {
-                    // Refill fuel
-                    const refuelAmount = Math.min(remainingCargoSpace(ship), 50 - shipCargoQuantity(ship, GoodType.FUEL));
-                    const result = await API.user.buyGood(ship.id, refuelAmount, GoodType.FUEL);
-                    userState.updateData(result);
-                }
-
-                ship = userState.getShipById(shipId);
-                if (ship.location !== location.symbol) {
-                    // Fly to given location
-                    const flyInfo = await API.user.createFlightPlan(ship.id, location.symbol);
-                    await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 1000);
-
-                    const remainingFuel = flyInfo.flightPlan.fuelRemaining;
-                    ship.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});
-                }
+                await shipActionService.refuel(ship, 80);
+                await shipActionService.fly(ship, location.symbol);
+                await shipActionService.refuel(ship, 80);
 
                 // Get marketplace data
                 const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
