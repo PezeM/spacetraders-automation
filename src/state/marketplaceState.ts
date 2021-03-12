@@ -37,8 +37,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
     }
 
     async getOrCreatePlanetMarketplace(location: string): Promise<PlanetMarketplace> {
-        // TODO: Cache result for given time
-        let marketplace = this.getMarketplaceData(location);
+        const marketplace = this.getMarketplaceData(location);
         if (marketplace) return marketplace;
 
         const marketplaceResponse = await API.game.getLocationMarketplace(location);
