@@ -4,7 +4,7 @@
   "username": "",
   "strategy": "PROFIT",
   "shipsToScrapMarket": "1",
-  "marketplaceRefreshTimer": "5000000",
+  "marketplaceRefreshTimer": "3000000",
   "sortProfitBy": "profitPerVolume",
   "defaultTrade": {
     "source": "OE-PM",

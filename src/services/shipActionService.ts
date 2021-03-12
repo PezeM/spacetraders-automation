@@ -23,6 +23,7 @@ export class ShipActionService {
         if (!ship.location || ship.location === destination) return;
         ship.isTraveling = true;
 
+        // TODO: If not enough fuel try to refuel
         const flyInfo = await API.user.createFlightPlan(ship.id, destination);
         logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
         await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking

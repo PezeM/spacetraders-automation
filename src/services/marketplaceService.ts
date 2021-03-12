@@ -47,10 +47,11 @@ class MarketplaceService implements IInitializeable {
             let ship = userState.getShipById(shipId);
             ship.isScoutShip = true;
             ship.isBusy = true;
+
             try {
-                await shipActionService.refuel(ship, 80);
+                await shipActionService.refuel(ship, 100);
                 await shipActionService.fly(ship, location.symbol);
-                await shipActionService.refuel(ship, 80);
+                await shipActionService.refuel(ship, 100);
 
                 // Get marketplace data
                 const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);

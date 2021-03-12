@@ -1,6 +1,6 @@
 import {BaseState} from "./baseState";
 import {IGame, MarketplaceSeller} from "../types/game.interface";
-import {GoodType, PlanetMarketplace} from "spacetraders-api-sdk";
+import {GoodType, Marketplace, PlanetMarketplace} from "spacetraders-api-sdk";
 import {MarketplaceProfit} from "../types/marketplace.interface";
 import {distance} from "../utils/math";
 import {API} from "../API";
@@ -8,15 +8,16 @@ import {MarketplaceProfitType} from "../types/marketplace.type";
 import {TradeStrategy} from "../types/enums/trade.enum";
 import logger from "../logger";
 import {PROFIT_DIST_MULT} from "../constants/profit";
+import NodeCache from "node-cache";
 
-export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
+export class MarketplaceState extends BaseState<NodeCache> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
     private _bestBuyers: Map<GoodType, MarketplaceSeller>;
     private _bestProfit: MarketplaceProfit[];
     private _worstProfit: MarketplaceProfit[];
 
     constructor(game: IGame) {
-        super(game, []);
+        super(game, new NodeCache({stdTTL: 60, checkperiod: 300}));
         this._bestSellers = new Map<GoodType, MarketplaceSeller>();
         this._bestBuyers = new Map<GoodType, MarketplaceSeller>();
         this._bestProfit = [];
@@ -32,7 +33,7 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     }
 
     getMarketplaceData(symbol: string) {
-        return this._data.find(m => m.symbol === symbol);
+        return this._data.get<PlanetMarketplace>(symbol);
     }
 
     async getOrCreatePlanetMarketplace(location: string): Promise<PlanetMarketplace> {
@@ -45,12 +46,7 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     }
 
     addMarketplaceData(planetMarketplace: PlanetMarketplace) {
-        const index = this._data.findIndex(m => m.symbol === planetMarketplace.symbol);
-        if (index !== -1) {
-            this._data[index] = planetMarketplace;
-        } else {
-            this._data.push(planetMarketplace);
-        }
+        this._data.set(planetMarketplace.symbol, planetMarketplace);
 
         this.computeBestBuyers();
         this.computeBestSellers();
@@ -139,45 +135,31 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
     }
 
     private computeBestSellers() {
-        const bestSellers = new Map<GoodType, MarketplaceSeller>();
-
-        for (const planet of this._data) {
-            for (const product of planet.marketplace) {
-                if (!product.quantityAvailable) continue;
-
-                const addedProduct = bestSellers.get(product.symbol);
-                if (addedProduct && addedProduct.pricePerUnit > product.pricePerUnit) continue;
-
-                bestSellers.set(product.symbol, {
-                    pricePerUnit: product.pricePerUnit,
-                    volumePerUnit: product.volumePerUnit,
-                    available: product.quantityAvailable,
-                    location: {
-                        symbol: planet.symbol,
-                        name: planet.name,
-                        type: planet.type,
-                        x: planet.x,
-                        y: planet.y
-                    }
-                });
-            }
-        }
-
+        const bestSellers = this.marketplaceSellersComputation((a, b) => a.pricePerUnit > b.pricePerUnit);
         this._bestSellers = bestSellers;
-        return this._bestSellers;
+        return bestSellers;
     }
 
     private computeBestBuyers() {
-        const bestBuyer = new Map<GoodType, MarketplaceSeller>();
+        const bestBuyer = this.marketplaceSellersComputation((a, b) => a.pricePerUnit < b.pricePerUnit);
+        this._bestBuyers = bestBuyer;
+        return bestBuyer;
+    }
 
-        for (const planet of this._data) {
+    private marketplaceSellersComputation(priceCheck: (a: MarketplaceSeller, b: Marketplace) => boolean) {
+        const sellersMap = new Map<GoodType, MarketplaceSeller>();
+
+        for (const key of this._data.keys()) {
+            const planet = this._data.get<PlanetMarketplace>(key);
+            if (!planet) continue;
+
             for (const product of planet.marketplace) {
                 if (!product.quantityAvailable) continue;
 
-                const addedProduct = bestBuyer.get(product.symbol);
-                if (addedProduct && addedProduct.pricePerUnit < product.pricePerUnit) continue;
+                const addedProduct = sellersMap.get(product.symbol);
+                if (addedProduct && priceCheck(addedProduct, product)) continue;
 
-                bestBuyer.set(product.symbol, {
+                sellersMap.set(product.symbol, {
                     pricePerUnit: product.pricePerUnit,
                     volumePerUnit: product.volumePerUnit,
                     available: product.quantityAvailable,
@@ -192,7 +174,6 @@ export class MarketplaceState extends BaseState<PlanetMarketplace[]> {
             }
         }
 
-        this._bestBuyers = bestBuyer;
-        return this._bestBuyers;
+        return sellersMap;
     }
 }
