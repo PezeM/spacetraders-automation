@@ -55,7 +55,7 @@ class MarketplaceService implements IInitializeable {
 
                 // Get marketplace data
                 const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
-                marketplaceState.addMarketplaceData(marketplaceResponse.planet);
+                marketplaceState.addMarketplaceData(marketplaceResponse.location);
                 logger.debug(`Fetched marketplace location from planet ${location.symbol}`);
                 logger.debug('Most profitable', {mostProfitable: marketplaceState.bestProfit});
             } catch (e) {

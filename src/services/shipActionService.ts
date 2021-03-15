@@ -52,8 +52,7 @@ export class ShipActionService {
     async buyGood(ship: UserShip, goodType: GoodType, amount: number) {
         const response = await API.user.buyGood(ship.id, amount, goodType);
         this._state.userState.updateData(response);
-        const order = response?.order?.find(o => o.good === goodType);
-        if (!order) return;
+        const order = response.order;
         logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
     }
 
@@ -61,8 +60,7 @@ export class ShipActionService {
         if (amount <= 0) return;
         const response = await API.user.sellGood(ship.id, amount, goodType);
         this._state.userState.updateData(response);
-        const order = response?.order?.find(o => o.good === goodType);
-        if (!order) return;
+        const order = response.order;
         logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
     }
 }

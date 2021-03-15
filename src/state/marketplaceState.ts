@@ -17,7 +17,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
     private _worstProfit: MarketplaceProfit[];
 
     constructor(game: IGame) {
-        super(game, new NodeCache({stdTTL: 60, checkperiod: 300}));
+        super(game, new NodeCache({stdTTL: 120, checkperiod: 300}));
         this._bestSellers = new Map<GoodType, MarketplaceSeller>();
         this._bestBuyers = new Map<GoodType, MarketplaceSeller>();
         this._bestProfit = [];
@@ -41,7 +41,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
         if (marketplace) return marketplace;
 
         const marketplaceResponse = await API.game.getLocationMarketplace(location);
-        return this.addMarketplaceData(marketplaceResponse.planet);
+        return this.addMarketplaceData(marketplaceResponse.location);
     }
 
     addMarketplaceData(planetMarketplace: PlanetMarketplace) {

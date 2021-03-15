@@ -17,9 +17,9 @@
   integrity sha512-z2WizAfIFgSv8SQfQ8c0LlbDAcK47D/o93XW6bxZ9t3bs4fmmfAPjk1nhAIBTG84PBBCHfSPM+8g7vhLdbFokg==
 
 "@types/node@^14.14.31":
-  version "14.14.33"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.33.tgz#9e4f8c64345522e4e8ce77b334a8aaa64e2b6c78"
-  integrity sha512-oJqcTrgPUF29oUP8AsUqbXGJNuPutsetaa9kTQAQce5Lx5dTYWV02ScBiT/k1BX/Z7pKeqedmvp39Wu4zR7N7g==
+  version "14.14.34"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.34.tgz#07935194fc049069a1c56c0c274265abeddf88da"
+  integrity sha512-dBPaxocOK6UVyvhbnpFIj2W+S+1cBTkHQbFQfeeJhoKFbzYcVUGHvddeWPSucKATb3F0+pgDq0i6ghEaZjsugA==
 
 async@^3.1.0:
   version "3.2.0"
@@ -295,10 +295,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-spacetraders-api-sdk@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/spacetraders-api-sdk/-/spacetraders-api-sdk-0.1.1.tgz#ea41065d79329e17762bc16b12ad1639968a0e0e"
-  integrity sha512-p5zdkuoVgl9t8lYZ06fqvxC4Kjw8vrrrJEW0jua18ipfUoyheZMUx+XUW20ynMvfOXpnX8BSbDUQhOR/Z1xDqA==
+spacetraders-api-sdk@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/spacetraders-api-sdk/-/spacetraders-api-sdk-0.2.1.tgz#91ec2a59c2280f0592f4ebeefba3d1e07d74da1a"
+  integrity sha512-Nu7jJeyksNQbWTxv9ho2qfP+DAJ9tj/F7X0IHGBD+snMwnobdQ0nORY7ih5RHYvpYc0KoeLZxCK6JNeoj3MKDA==
   dependencies:
     bottleneck "^2.19.5"
     node-fetch "^2.6.1"

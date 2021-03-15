@@ -18,6 +18,7 @@ export class TradeService {
 
     async tradeLoop(ships: Ship[]) {
         const trade = getBestTrade(this._game.state.marketplaceState, CONFIG.get('strategy'));
+        if (!trade) return;
 
         for (const ship of ships) {
             if (ship.isBusy) continue;
