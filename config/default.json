@@ -14,5 +14,8 @@
   "shipToBuy": "JW-MK-I",
   "minMoneyLeftAfterBuyingShip": 100000,
   "sellNotUsedCargo": true,
-  "cacheTTL": 300
+  "cacheTTL": 300,
+  "payLoans": {
+    "minMoneyLeftAfterLoanPayment": 200000
+  }
 }

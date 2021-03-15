@@ -15,6 +15,9 @@ export interface IConfig {
     minMoneyLeftAfterBuyingShip: number;
     sellNotUsedCargo: boolean;
     cacheTTL: number;
+    payLoans?: {
+        minMoneyLeftAfterLoanPayment: number;
+    }
 }
 
 export interface ITradeData {

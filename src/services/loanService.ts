@@ -1,8 +1,9 @@
 import {IGame} from "../types/game.interface";
 import {UserState} from "../state/userState";
 import {API} from "../API";
-import {LoanType} from "spacetraders-api-sdk";
+import {LoanType, UserLoan} from "spacetraders-api-sdk";
 import logger from "../logger";
+import {LoanStatus} from "spacetraders-api-sdk/lib/types/user.enum";
 
 export class LoanService {
     async checkIfLoanIsNeeded(game: IGame, userState: UserState, requiredMoney?: number): Promise<boolean> {
@@ -22,6 +23,22 @@ export class LoanService {
             return true;
         } catch (e) {
             logger.error(`Couldn't take loan ${loanType}`, e);
+            return false;
+        }
+    }
+
+    async payLoan(userState: UserState, loan: UserLoan, requiredMoneyLeft?: number): Promise<boolean> {
+        if (loan.status !== LoanStatus.CURRENT) return false;
+        if (requiredMoneyLeft && userState.data.credits - loan.repaymentAmount < requiredMoneyLeft) return false;
+
+        try {
+            const response = await API.user.payLoan(loan.id);
+            userState.updateData(response.user);
+            logger.info(`Paid loan ${loan.id} ${loan.repaymentAmount}$`);
+            logger.info(userState.toString());
+            return true;
+        } catch (e) {
+            logger.error(`Error while trying to pay loan ${loan.id}`, e);
             return false;
         }
     }
