@@ -11,7 +11,8 @@
     "destination": "OE-PM-TR",
     "itemToTrade": "SHIP_PLATING"
   },
-  "shipToBuy": "GR-MK-I",
+  "shipToBuy": "JW-MK-I",
   "minMoneyLeftAfterBuyingShip": 100000,
-  "sellNotUsedCargo": true
+  "sellNotUsedCargo": true,
+  "cacheTTL": 300
 }

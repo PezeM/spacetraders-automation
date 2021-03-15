@@ -9,6 +9,7 @@ import {TradeStrategy} from "../types/enums/trade.enum";
 import logger from "../logger";
 import {PROFIT_DIST_MULT} from "../constants/profit";
 import NodeCache from "node-cache";
+import {CONFIG} from "../config";
 
 export class MarketplaceState extends BaseState<NodeCache> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -17,7 +18,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
     private _worstProfit: MarketplaceProfit[];
 
     constructor(game: IGame) {
-        super(game, new NodeCache({stdTTL: 120, checkperiod: 300}));
+        super(game, new NodeCache({stdTTL: CONFIG.get('cacheTTL'), checkperiod: 300}));
         this._bestSellers = new Map<GoodType, MarketplaceSeller>();
         this._bestBuyers = new Map<GoodType, MarketplaceSeller>();
         this._bestProfit = [];

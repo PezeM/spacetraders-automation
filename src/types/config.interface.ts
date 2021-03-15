@@ -14,6 +14,7 @@ export interface IConfig {
     shipToBuy?: string;
     minMoneyLeftAfterBuyingShip: number;
     sellNotUsedCargo: boolean;
+    cacheTTL: number;
 }
 
 export interface ITradeData {

@@ -99,5 +99,7 @@ export class Game implements IGame {
         } catch (e) {
             console.error(`Couldn't synchronize user state with server`, e);
         }
+
+        // TODO: Pay loans
     }
 }
