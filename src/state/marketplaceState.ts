@@ -72,7 +72,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
 
     getBestTradeBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit, ship?: UserShip) {
         const bestTrade = this.getTradesBy(sortedBy, strategy, ship)[0];
-        if (!bestTrade[sortedBy]) return undefined;
+        if (!bestTrade || !bestTrade[sortedBy]) return undefined;
         return bestTrade;
     }
 
