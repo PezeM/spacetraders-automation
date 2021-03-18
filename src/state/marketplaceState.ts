@@ -66,7 +66,6 @@ export class MarketplaceState extends BaseState<NodeCache> {
             }
         }
 
-        console.log(`Trade`, source);
         return source.sort((a, b) =>
             (b[sortedBy] ?? b["profitPerItem"]) - (a[sortedBy] ?? a["profitPerItem"]));
     }
