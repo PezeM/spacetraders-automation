@@ -16,10 +16,10 @@ export const getBestTrade = (marketplaceState: MarketplaceState, ship: UserShip,
         itemToTrade: GoodType.SHIP_PLATING
     }
 
-    const bestMarketplaceTrade = marketplaceState.getBestTradeBy(CONFIG.get('sortProfitBy'), strategy, ship);
-    if (bestMarketplaceTrade && (bestMarketplaceTrade.buy.available
-        / (!bestMarketplaceTrade.buy.volumePerUnit ? 1 : bestMarketplaceTrade.buy.volumePerUnit) > 500))
-        return marketplaceProfitToTradeData(bestMarketplaceTrade);
+    const bestMarketTrade = marketplaceState.getBestTradeBy(CONFIG.get('sortProfitBy'), strategy, ship);
+    if (bestMarketTrade && (bestMarketTrade.buy.available
+        / (!bestMarketTrade.buy.volumePerUnit ? 1 : bestMarketTrade.buy.volumePerUnit) > 300))
+        return marketplaceProfitToTradeData(bestMarketTrade);
 
     return CONFIG.has('defaultTrade') ? CONFIG.get('defaultTrade') as ITradeData : defaultTrade;
 }
