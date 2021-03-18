@@ -17,11 +17,11 @@ export class TradeService {
     }
 
     async tradeLoop(ships: Ship[]) {
-        const trade = getBestTrade(this._game.state.marketplaceState, CONFIG.get('strategy'));
-        if (!trade) return;
-
         for (const ship of ships) {
             if (ship.isBusy) continue;
+            const trade = getBestTrade(this._game.state.marketplaceState, ship, CONFIG.get('strategy'));
+            if (!trade) continue;
+
             this.trade(ship, trade);
             await wait(1000);
         }

@@ -5,6 +5,7 @@ export interface MarketplaceProfitPer {
     profitPerItem: number;
     profitPerVolume: number;
     profitPerItemPercentage: number;
+    ror?: number;
 }
 
 export interface MarketplaceProfit extends MarketplaceProfitPer {

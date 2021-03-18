@@ -1,10 +1,11 @@
-import {Cargo, GoodType, ShopShip, UserShip} from "spacetraders-api-sdk";
+import {AsteroidType, Cargo, GoodType, Location, ShopShip, UserShip} from "spacetraders-api-sdk";
 import {CheapestShip} from "../types/ship.type";
 import {API} from "../API";
 import logger from "../logger";
 import {UserState} from "../state/userState";
 import {GameState} from "../state/gameState";
-import {Ship} from "../models/ship";
+import {distance} from "./math";
+import {IVector2} from "../types/math.interface";
 
 /**
  * Returns cheapest ship from ships list
@@ -74,4 +75,28 @@ export const isValidCargo = (input: any): input is Cargo => {
 
 export const filterShipCargos = (ship: UserShip, goods: GoodType[]) => {
     return ship.cargo.filter(c => !goods.includes(c.good));
+}
+
+/**
+ * Returns required fuel to travel from source to destination
+ * @param source Starting location
+ * @param dest Destination location
+ */
+export const calculateRequiredFuel = (source: Pick<Location, 'x' | 'y' | 'type'>, dest: Pick<Location, 'x' | 'y' | 'type'>): number => {
+    const penalty = source.type === AsteroidType.PLANET ? 2 : 0; // Penalty is 2 when departing from planet
+    const dist = distance(source, dest);
+
+    return Math.round((Math.round(dist) / 4)) + penalty + 1;
+}
+
+/**
+ * Returns travel time between two locations in seconds
+ * @param shipSpeed Speed of the ship
+ * @param source Starting location
+ * @param dest Destination location
+ */
+export const calculateTravelTime = (shipSpeed: number, source: IVector2, dest: IVector2): number => {
+    const dist = distance(source, dest);
+
+    return Math.round(((15 / shipSpeed) * Math.round(dist)) + 59);
 }

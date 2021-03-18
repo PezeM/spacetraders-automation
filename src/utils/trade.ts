@@ -1,11 +1,11 @@
 import {CONFIG} from "../config";
 import {ITradeData} from "../types/config.interface";
-import {GoodType} from "spacetraders-api-sdk";
+import {GoodType, UserShip} from "spacetraders-api-sdk";
 import {MarketplaceState} from "../state/marketplaceState";
 import {MarketplaceProfit} from "../types/marketplace.interface";
 import {TradeStrategy} from "../types/enums/trade.enum";
 
-export const getBestTrade = (marketplaceState: MarketplaceState, strategy: TradeStrategy = TradeStrategy.Profit): ITradeData => {
+export const getBestTrade = (marketplaceState: MarketplaceState, ship: UserShip, strategy: TradeStrategy = TradeStrategy.Profit): ITradeData => {
     const defaultTrade = strategy === TradeStrategy.Profit ? {
         source: 'OE-PM',
         destination: 'OE-PM-TR',
@@ -16,7 +16,7 @@ export const getBestTrade = (marketplaceState: MarketplaceState, strategy: Trade
         itemToTrade: GoodType.SHIP_PLATING
     }
 
-    const bestMarketplaceTrade = marketplaceState.getBestTradeBy(CONFIG.get('sortProfitBy'), strategy);
+    const bestMarketplaceTrade = marketplaceState.getBestTradeBy(CONFIG.get('sortProfitBy'), strategy, ship);
     if (bestMarketplaceTrade && (bestMarketplaceTrade.buy.available
         / (!bestMarketplaceTrade.buy.volumePerUnit ? 1 : bestMarketplaceTrade.buy.volumePerUnit) > 500))
         return marketplaceProfitToTradeData(bestMarketplaceTrade);

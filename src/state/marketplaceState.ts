@@ -1,6 +1,6 @@
 import {BaseState} from "./baseState";
 import {IGame, MarketplaceSeller} from "../types/game.interface";
-import {GoodType, Marketplace, PlanetMarketplace} from "spacetraders-api-sdk";
+import {GoodType, Marketplace, PlanetMarketplace, UserShip} from "spacetraders-api-sdk";
 import {MarketplaceProfit} from "../types/marketplace.interface";
 import {distance} from "../utils/math";
 import {API} from "../API";
@@ -10,6 +10,7 @@ import logger from "../logger";
 import {PROFIT_DIST_MULT} from "../constants/profit";
 import NodeCache from "node-cache";
 import {CONFIG} from "../config";
+import {calculateRequiredFuel, calculateTravelTime} from "../utils/ship";
 
 export class MarketplaceState extends BaseState<NodeCache> {
     private _bestSellers: Map<GoodType, MarketplaceSeller>;
@@ -56,13 +57,22 @@ export class MarketplaceState extends BaseState<NodeCache> {
         return planetMarketplace;
     }
 
-    getTradesBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit) {
+    getTradesBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit, ship?: UserShip) {
         let source = strategy === TradeStrategy.Profit ? this._bestProfit : this._worstProfit;
-        return source.sort((a, b) => b[sortedBy] - a[sortedBy]);
+        if (ship) {
+            // Add rate of return
+            for (const marketplaceProfit of source) {
+                marketplaceProfit.ror = this.calculateRateOfReturn(ship, marketplaceProfit.buy, marketplaceProfit.sell);
+            }
+        }
+
+        console.log(`Trade`, source);
+        return source.sort((a, b) =>
+            (b[sortedBy] ?? b["profitPerItem"]) - (a[sortedBy] ?? a["profitPerItem"]));
     }
 
-    getBestTradeBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit) {
-        return this.getTradesBy(sortedBy, strategy)[0];
+    getBestTradeBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit, ship?: UserShip) {
+        return this.getTradesBy(sortedBy, strategy, ship)[0];
     }
 
     computeBestProfit() {
@@ -96,7 +106,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
 
         this._bestProfit = bestProfit.sort((a, b) => b.profitPerVolume - a.profitPerVolume);
         this._isInitialized = new Promise(r => r(true));
-        logger.debug(`Most profitable trades`, {bestProfit: this._bestProfit})
+        logger.debug(`Most profitable trades`, {bestProfit: this._bestProfit});
         return this._bestProfit;
     }
 
@@ -175,5 +185,15 @@ export class MarketplaceState extends BaseState<NodeCache> {
         }
 
         return sellersMap;
+    }
+
+    private calculateRateOfReturn(ship: UserShip, buy: MarketplaceSeller, sell: MarketplaceSeller) {
+        const fuelNeeded = calculateRequiredFuel(buy.location, sell.location);
+        const shipPrice = this._game.state.shipShopState.getPriceOfShip(ship.type) ?? 100000;
+        const flightTimeInHours = calculateTravelTime(ship.speed, buy.location, sell.location) / 3600;
+
+        const quantity = Math.min(buy.available, Math.floor((ship.maxCargo - fuelNeeded) / buy.volumePerUnit));
+
+        return Math.pow((1 + (sell.pricePerUnit - buy.pricePerUnit) * quantity / (buy.pricePerUnit * quantity + shipPrice)), 1 / flightTimeInHours) - 1;
     }
 }
