@@ -1,7 +1,7 @@
 {
-  "name": "spacetraders-test",
+  "name": "spacetraders-automation",
   "version": "1.0.0",
-  "description": "",
+  "description": "Typescript NodeJS automation tool for spacetraders.io API",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && xcopy /e /k /i /y \"config\" \"dist/config\"",
@@ -9,7 +9,7 @@
     "start:prod": "yarn build && cd dist && cross-env NODE_ENV=production node index.js",
     "start:dev": "yarn build && cd dist && cross-env NODE_ENV=development node index.js"
   },
-  "author": "",
+  "author": "PezeM",
   "license": "ISC",
   "dependencies": {
     "class-transformer": "^0.4.0",

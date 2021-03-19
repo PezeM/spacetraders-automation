@@ -1,3 +1,4 @@
 export const LOCATION_SYMBOLS: string[] = [
-    'OE'
+    'OE',
+    'XV'
 ];
