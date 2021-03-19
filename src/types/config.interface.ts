@@ -3,9 +3,9 @@ import {MarketplaceProfitType} from "./marketplace.type";
 import {TradeStrategy} from "./enums/trade.enum";
 
 export interface IConfig {
-    logsDir: string;
     username: string;
     token: string;
+    logsDir: string;
     strategy: TradeStrategy;
     shipsToScrapMarket: number | "MAX";
     marketplaceRefreshTimer: number;
