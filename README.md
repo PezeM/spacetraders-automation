@@ -8,8 +8,6 @@ Built with Typescript
 * [Running application](#running-application)
 * [License](#license)
 
----
-
 ## How To Use
 
 ### Prerequisites
