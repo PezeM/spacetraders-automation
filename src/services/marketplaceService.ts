@@ -42,6 +42,7 @@ class MarketplaceService implements IInitializeable {
         scoutShips.forEach(s => s.isScoutShip = true);
 
         const sortedLocations = sortLocationsByDistance(locationState.data);
+        this.logSortedLocations(sortedLocations);
         this.testFlight(sortedLocations, scoutShips, game);
     }
 
@@ -125,6 +126,13 @@ class MarketplaceService implements IInitializeable {
         }
 
         return scoutShips;
+    }
+
+    private logSortedLocations(sortedLocations: LocationWithDistance[]) {
+        logger.info('Marketplace locations in order:', {
+                locations: sortedLocations.map(v => `${v.symbol} Dist: ${Math.floor(v.distance)} (x: ${v.x} y: ${v.y})`)
+            }
+        )
     }
 }
 
