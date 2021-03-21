@@ -1,75 +1,130 @@
 import {IGame} from "../types/game.interface";
 import {CONFIG} from "../config";
-import {buyShip, getCheapestShip, getScoutShipId} from "../utils/ship";
+import {buyShip, getCheapestShip} from "../utils/ship";
 import {API} from "../API";
 import {IInitializeable} from "../types/initializeable.interface";
 import logger from "../logger";
 import {ShipActionService} from "./shipActionService";
+import {Location} from "spacetraders-api-sdk";
+import {UserState} from "../state/userState";
+import {ShipShopState} from "../state/shipShopState";
+import {sortLocationsByDistance} from "../utils/location";
+import {LocationWithDistance} from "../types/location.interface";
+import {Ship} from "../models/ship";
+import {waitFor} from "../utils/general";
+import {MarketplaceState} from "../state/marketplaceState";
+import {GameState} from "../state/gameState";
 
 class MarketplaceService implements IInitializeable {
-    private _isTimerRunning: boolean = false;
     private _isInitialized: boolean = false;
-    private _timer?: NodeJS.Timeout;
+    private _loopFinished: boolean = false;
 
     async initializeService(game: IGame) {
-        // Interval to refresh marketplace
         if (this._isInitialized) return;
 
         if (!CONFIG.has('shipsToScrapMarket')) return;
 
-        this.fetchMarketplace(game);
-        this._timer = setInterval(this.fetchMarketplace.bind(this, game), CONFIG.get('marketplaceRefreshTimer'));
+        await this.fetchMarketplace(game);
         this._isInitialized = true;
     }
 
     private async fetchMarketplace(game: IGame) {
-        if (this._isTimerRunning) return;
-        const shipsToScrapMarket = CONFIG.get('shipsToScrapMarket');
-        if (!shipsToScrapMarket || shipsToScrapMarket <= 0) return;
-        const shipActionService = new ShipActionService(game.state);
+        const {locationState, userState, shipShopState} = game.state;
 
-        this._isTimerRunning = true;
+        let shipsToScrapMarket = CONFIG.get('shipsToScrapMarket');
+        if (shipsToScrapMarket === "MAX") shipsToScrapMarket = locationState.data.length;
+
+        if (!shipsToScrapMarket || shipsToScrapMarket <= 0) return;
+
         logger.info('Fetching marketplace');
 
-        const {locationState, userState, marketplaceState} = game.state;
+        const scoutShips = await this.getScoutShips(userState, shipShopState, shipsToScrapMarket);
+        scoutShips.forEach(s => s.isScoutShip = true);
 
-        // Get scout ship id, if no scout ship then buy one
-        let shipId = getScoutShipId(game.state);
-        if (!shipId) {
-            const cheapestShip = getCheapestShip(game.state.shipShopState.data);
-            const newShip = await buyShip(game.state.userState, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
-            shipId = newShip.id;
-        }
+        const sortedLocations = sortLocationsByDistance(locationState.data);
+        this.testFlight(sortedLocations, scoutShips, game);
+    }
 
-        for (const location of locationState.data) {
-            logger.debug(`Fetching marketplace data in location ${location.symbol}`);
+    private async testFlight(locations: LocationWithDistance[], ships: Ship[], game: IGame) {
+        const visitedLocations: string[] = [];
+        let interval = setInterval(this.marketplaceLoop.bind(this, visitedLocations, locations, ships, game.state), 1000);
 
-            let ship = userState.getShipById(shipId);
-            ship.isScoutShip = true;
-            ship.isBusy = true;
-
-            try {
-                await shipActionService.refuel(ship, 100);
-                await shipActionService.fly(ship, location.symbol);
-                await shipActionService.refuel(ship, 100);
-
-                // Get marketplace data
-                const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
-                marketplaceState.addMarketplaceData(marketplaceResponse.location);
-                logger.debug(`Fetched marketplace location from planet ${location.symbol}`);
-                logger.debug('Most profitable', {mostProfitable: marketplaceState.bestProfit});
-            } catch (e) {
-                logger.error(`Couldn't get marketplace data`, e);
-                ship.isBusy = false;
-            }
-
-            ship.isTraveling = false;
-            ship.isBusy = false;
-        }
+        await waitFor(() => this._loopFinished, undefined, 1000);
+        clearInterval(interval);
 
         logger.info('Fetched all marketplace data');
-        logger.info('Most profitable', {mostProfitable: marketplaceState.bestProfit});
-        this._isTimerRunning = false;
+        logger.info('Most profitable', {mostProfitable: game.state.marketplaceState.bestProfit});
+
+        ships.forEach(s => s.isScoutShip = false);
+        setTimeout(this.fetchMarketplace.bind(this, game), CONFIG.get('marketplaceRefreshTimer'));
+    }
+
+    private async marketplaceLoop(visitedLocations: string[], locations: LocationWithDistance[],
+                                  ships: Ship[], state: GameState) {
+        const {marketplaceState} = state;
+        const shipActionService = new ShipActionService(state);
+
+        for (const location of locations) {
+            if (visitedLocations.includes(location.symbol)) continue;
+            const ship = ships.find(s => !s.isTraveling && !s.isBusy);
+            if (!ship) continue;
+
+            await this.visitLocation(ship, location, visitedLocations, shipActionService, marketplaceState);
+        }
+
+        this._loopFinished = visitedLocations.length === locations.length && ships.every(s => !s.isBusy);
+    }
+
+    private async visitLocation(ship: Ship, location: Location, visitedLocations: string[],
+                                shipActionService: ShipActionService, marketplaceState: MarketplaceState) {
+        ship.isBusy = true;
+        visitedLocations.push(location.symbol);
+
+        try {
+            await shipActionService.refuel(ship, 100);
+            await shipActionService.fly(ship, location.symbol);
+            await shipActionService.refuel(ship, 100);
+
+            // Get marketplace data
+            const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
+            marketplaceState.addMarketplaceData(marketplaceResponse.location);
+            logger.debug(`Fetched marketplace location from planet ${location.symbol}`);
+            logger.debug('Most profitable', {mostProfitable: marketplaceState.bestProfit});
+        } catch (e) {
+            logger.verbose(`Couldn't fetch marketplace in system ${location.symbol}`);
+        }
+
+        ship.isTraveling = false;
+        ship.isBusy = false;
+    }
+
+    private async getScoutShips(userState: UserState, shipShopState: ShipShopState, shipsToScrapMarket: number) {
+        const scoutShips = userState.getShips(true);
+
+        const cheapestShip = getCheapestShip(shipShopState.data);
+        const cheapestShips = userState.data.ships
+            .filter(s => s.type === cheapestShip.ship.type
+                && s.manufacturer === cheapestShip.ship.manufacturer);
+
+        for (const ship of cheapestShips) {
+            if (scoutShips.length >= shipsToScrapMarket) break;
+            scoutShips.push(ship);
+        }
+
+        if (scoutShips.length < shipsToScrapMarket) {
+            while (scoutShips.length < shipsToScrapMarket) {
+                try {
+                    const newShip = await buyShip(userState, cheapestShip.purchaseLocation.location, cheapestShip.ship.type);
+                    if (newShip) {
+                        scoutShips.push(newShip);
+                    }
+                } catch (e) {
+                    break;
+                }
+            }
+        }
+
+        return scoutShips;
     }
 }
 

@@ -6,6 +6,7 @@ import {UserState} from "../state/userState";
 import {GameState} from "../state/gameState";
 import {distance} from "./math";
 import {IVector2} from "../types/math.interface";
+import {Ship} from "../models/ship";
 
 /**
  * Returns cheapest ship from ships list
@@ -32,14 +33,14 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
     return {ship: ships[0], purchaseLocation: ships[0].purchaseLocations[0]}
 }
 
-export const buyShip = async (userState: UserState, location: string, shipType: string): Promise<UserShip> => {
+export const buyShip = async (userState: UserState, location: string, shipType: string): Promise<Ship> => {
     try {
         const result = await API.user.buyShip(location, shipType);
         const newShip = result.user.ships[result.user.ships.length - 1];
         logger.info(`Bought new ship ${shipType} ${newShip.id}`, {shipId: newShip.id});
         userState.updateData(result.user);
         logger.info(userState.toString());
-        return newShip;
+        return userState.getShipById(newShip.id);
     } catch (e) {
         logger.error(`Couldn't buy ship type ${shipType}. Remaining credit ${userState.data.credits}`);
         throw e;

@@ -3,9 +3,9 @@
   "token": "",
   "username": "",
   "strategy": "PROFIT",
-  "shipsToScrapMarket": "0",
+  "shipsToScrapMarket": "2",
   "marketplaceRefreshTimer": "3000000",
-  "sortProfitBy": "profitPerVolume",
+  "sortProfitBy": "ror",
   "defaultTrade": {
     "source": "OE-PM",
     "destination": "OE-PM-TR",

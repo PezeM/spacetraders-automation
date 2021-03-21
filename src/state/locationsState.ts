@@ -28,10 +28,7 @@ export class LocationsState extends BaseState<Location[]> {
             const locations = await API.game.getLocations(symbol);
             if (!locations || locations.locations?.length === 0) continue;
 
-            for (const location of locations.locations) {
-                if (this._data.some(l => l.name === location.name || l.symbol === location.symbol)) continue;
-                this._data.push(location);
-            }
+            this._data = this._data.concat(locations.locations);
         }
     }
 }
