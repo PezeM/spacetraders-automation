@@ -56,7 +56,7 @@ export class Game implements IGame {
         if (!CONFIG.has('defaultTrade')) {
             logger.info(`Default trade not defined, waiting for any profitable trade`);
             await waitFor(() =>
-                this.state.marketplaceState.getTradesBy("profitPerItem", CONFIG.get('strategy')).length > 0,
+                this.state.marketplaceState.getTradesBy(CONFIG.get('sortProfitBy'), CONFIG.get('strategy')).length > 0,
                 undefined, 500);
         }
 
