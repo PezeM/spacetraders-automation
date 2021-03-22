@@ -2,18 +2,19 @@
   "name": "spacetraders-automation-server",
   "version": "1.0.0",
   "description": "Typescript NodeJS automation tool for spacetraders.io API",
-  "main": "../../dist/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && xcopy /e /k /i /y \"../../config\" \"../../dist/config\"",
+    "build": "tsc && xcopy /e /k /i /y \"../../config\" \"dist/config\"",
     "watch": "tsc --watch",
-    "start:prod": "yarn build && cd ../../dist && cross-env NODE_ENV=production node index.js",
-    "start:dev": "yarn build && cd ../../dist && cross-env NODE_ENV=development node index.js"
+    "start:prod": "yarn build && cd dist && cross-env NODE_ENV=production node index.js",
+    "start:dev": "yarn build && cd dist && cross-env NODE_ENV=development node index.js"
   },
   "author": "PezeM",
   "license": "ISC",
   "dependencies": {
     "class-transformer": "^0.4.0",
     "config": "^3.3.4",
+    "express": "^4.17.1",
     "node-cache": "^5.1.2",
     "reflect-metadata": "^0.1.13",
     "spacetraders-api-sdk": "^0.2.3",
