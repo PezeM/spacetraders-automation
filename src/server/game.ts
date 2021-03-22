@@ -10,6 +10,7 @@ import {marketplaceService} from "./services/marketplaceService";
 import {TradeService} from "./services/tradeService";
 import {LoanStatus} from "spacetraders-api-sdk/lib/types/user.enum";
 import {LoanService} from "./services/loanService";
+import {createExpressServer} from "./expressServer";
 
 export class Game implements IGame {
     public readonly state: GameState;
@@ -38,6 +39,7 @@ export class Game implements IGame {
                 logger.info(this.state.userState);
                 logger.info(`Ships ${this.state.userState.data.ships.length}`);
 
+                createExpressServer(this);
                 await this.initializeGame();
             });
     }
