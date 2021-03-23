@@ -17,5 +17,6 @@
   "cacheTTL": 300,
   "payLoans": {
     "minMoneyLeftAfterLoanPayment": 200000
-  }
+  },
+  "expressServerPort": 8081
 }

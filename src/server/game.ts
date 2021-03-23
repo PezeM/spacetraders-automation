@@ -101,7 +101,7 @@ export class Game implements IGame {
                 userState.updateData(response.user);
             }
         } catch (e) {
-            console.error(`Couldn't synchronize user state with server`, e);
+            logger.error(`Couldn't synchronize user state with server`, e);
         }
 
         // Pay loans

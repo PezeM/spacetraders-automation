@@ -17,7 +17,8 @@ export interface IConfig {
     cacheTTL: number;
     payLoans?: {
         minMoneyLeftAfterLoanPayment: number;
-    }
+    },
+    expressServerPort: number;
 }
 
 export interface ITradeData {
