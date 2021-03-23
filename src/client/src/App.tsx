@@ -1,26 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import useSWR, {SWRConfig} from 'swr';
+
+const baseUrl = 'http://localhost:8081'
+
+const fetcher = (url: string, ...args: any[]) => fetch(`${baseUrl}/${url}`, ...args).then(res => res.json());
+
+const TestUser = () => {
+    const {data, error, mutate} = useSWR('user/', {refreshInterval: 1000});
+
+    if (!data) {
+        return <div>Loading data...</div>;
+    }
+
+    if (error) return <div onClick={() => mutate()}>Error</div>;
+
+    return (
+        <div>
+            Test data
+            <pre>
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </div>
+    )
+}
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <SWRConfig value={{
+            fetcher,
+            revalidateOnFocus: true
+        }}>
+            <div className="App">
+                <TestUser/>
+            </div>
+        </SWRConfig>
+    );
 }
 
 export default App;
