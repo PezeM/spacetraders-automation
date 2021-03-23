@@ -8,6 +8,8 @@ export const shipRoutes = (game: IGame) => {
 
     router.get('/', shipRouter.getShips);
     router.get('/:id', shipRouter.getShip);
+    router.get('/cheapestShip', shipRouter.getCheapestShip);
+    router.get('/bestTrade', shipRouter.getBestTradeForShip);
 
     return router;
 }

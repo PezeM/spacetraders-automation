@@ -28,6 +28,7 @@ export const marketplaceProfitToTradeData = (marketplaceProfit: MarketplaceProfi
     return {
         itemToTrade: marketplaceProfit.symbol,
         source: marketplaceProfit.buy.location.symbol,
-        destination: marketplaceProfit.sell.location.symbol
+        destination: marketplaceProfit.sell.location.symbol,
+        ...marketplaceProfit
     }
 }
