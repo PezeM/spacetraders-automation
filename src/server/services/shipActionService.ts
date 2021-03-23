@@ -25,10 +25,12 @@ export class ShipActionService {
 
         // TODO: If not enough fuel try to refuel
         const flyInfo = await API.user.createFlightPlan(ship.id, destination);
+        ship.flightPlan = flyInfo.flightPlan;
         logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
         await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
         logger.info(`Ship ${ship.id} arrived at ${destination}`);
-
+        ship.flightPlan = undefined;
+        
         const remainingFuel = flyInfo.flightPlan.fuelRemaining;
         ship.updateData({location: flyInfo.flightPlan.destination});
         ship.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});

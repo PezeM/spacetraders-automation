@@ -1,4 +1,4 @@
-import {Cargo, GoodType, UserShip} from "spacetraders-api-sdk";
+import {Cargo, FlightPlan, GoodType, UserShip} from "spacetraders-api-sdk";
 import {plainToClass, plainToClassFromExist} from "class-transformer";
 import {isValidCargo} from "../utils/ship";
 
@@ -19,6 +19,7 @@ export class Ship implements UserShip {
     public isScoutShip: boolean = false;
     public isTraveling: boolean = false;
     public isBusy: boolean = false;
+    public flightPlan?: FlightPlan;
 
     static createShip(data: UserShip | Ship): Ship {
         return plainToClass(Ship, data);
