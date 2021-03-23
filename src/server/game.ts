@@ -99,17 +99,8 @@ export class Game implements IGame {
 
         // Pay loans
         if (CONFIG.has('payLoans')) {
-            const minMoneyLeftAfterLoanPayment = CONFIG.get('payLoans')?.minMoneyLeftAfterLoanPayment ?? 0;
-            if (minMoneyLeftAfterLoanPayment) {
-                const unpaidLoans = userState.data.loans.filter(l => l.status === LoanStatus.CURRENT);
-                if (unpaidLoans.length > 0) {
-                    const loanService = new LoanService();
-
-                    for (const unpaidLoan of unpaidLoans) {
-                        await loanService.payLoan(this.state.userState, unpaidLoan, minMoneyLeftAfterLoanPayment);
-                    }
-                }
-            }
+            const loanService = new LoanService();
+            await loanService.payLoans(userState);
         }
     }
 }
