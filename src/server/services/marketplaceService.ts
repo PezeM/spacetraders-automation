@@ -43,15 +43,17 @@ class MarketplaceService implements IInitializeable {
 
         const sortedLocations = sortLocationsByDistance(locationState.data);
         this.logSortedLocations(sortedLocations);
-        this.testFlight(sortedLocations, scoutShips, game);
+        this.startMarketFetching(sortedLocations, scoutShips, game);
     }
 
-    private async testFlight(locations: LocationWithDistance[], ships: Ship[], game: IGame) {
+    private async startMarketFetching(locations: LocationWithDistance[], ships: Ship[], game: IGame) {
         const visitedLocations: string[] = [];
+        this._loopFinished = false;
         let interval = setInterval(this.marketplaceLoop.bind(this, visitedLocations, locations, ships, game.state), 1000);
 
         await waitFor(() => this._loopFinished, undefined, 1000);
         clearInterval(interval);
+        this._loopFinished = false;
 
         logger.info('Fetched all marketplace data');
         logger.info('Most profitable', {mostProfitable: game.state.marketplaceState.bestProfit});
