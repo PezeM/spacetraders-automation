@@ -4,10 +4,10 @@ import {LoanController} from "../loanController";
 
 export const loanRoutes = (game: IGame) => {
     const router = Router();
-    const loanRouter = new LoanController(game);
+    const loanController = new LoanController(game);
 
-    router.put('/pay/:id', loanRouter.payLoan);
-    router.put('/pay-all', loanRouter.payLoans);
+    router.put('/pay/:id', loanController.payLoan);
+    router.put('/pay-all', loanController.payLoans);
 
     return router;
 }

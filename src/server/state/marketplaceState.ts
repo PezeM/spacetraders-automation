@@ -30,6 +30,10 @@ export class MarketplaceState extends BaseState<NodeCache> {
         return this._bestProfit;
     }
 
+    get worstProfit() {
+        return this._worstProfit;
+    }
+
     async initializeState(): Promise<void> {
         this._isInitialized = new Promise(r => r(false));
     }
