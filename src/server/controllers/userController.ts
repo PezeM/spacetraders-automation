@@ -26,7 +26,6 @@ export class UserController extends BaseController {
             return;
         }
 
-        res.status(200)
-            .send(user);
+        res.status(200).send(user);
     }
 }
