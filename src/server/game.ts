@@ -11,6 +11,7 @@ import {TradeService} from "./services/tradeService";
 import {LoanStatus} from "spacetraders-api-sdk/lib/types/user.enum";
 import {LoanService} from "./services/loanService";
 import {createExpressServer} from "./expressServer";
+import {UserService} from "./services/userService";
 
 export class Game implements IGame {
     public readonly state: GameState;
@@ -94,15 +95,7 @@ export class Game implements IGame {
             }
         }
 
-        // Synchronize api
-        try {
-            const response = await API.user.getUser();
-            if (response) {
-                userState.updateData(response.user);
-            }
-        } catch (e) {
-            logger.error(`Couldn't synchronize user state with server`, e);
-        }
+        await new UserService().syncUser(userState);
 
         // Pay loans
         if (CONFIG.has('payLoans')) {
