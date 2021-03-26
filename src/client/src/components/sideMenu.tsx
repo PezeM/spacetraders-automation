@@ -20,7 +20,7 @@ interface Props {
 }
 
 export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
-    const theme = 'light';
+    const theme = 'dark';
     const history = useHistory();
 
     const handleSideMenuClick = (action: { item: ReactInstance, key: Key, keyPath: Key[] }) => {
