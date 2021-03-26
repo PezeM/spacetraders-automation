@@ -3,7 +3,7 @@
   "token": "",
   "username": "",
   "strategy": "PROFIT",
-  "shipsToScrapMarket": "2",
+  "shipsToScrapMarket": "1",
   "marketplaceRefreshTimer": "3000000",
   "sortProfitBy": "ror",
   "defaultTrade": {

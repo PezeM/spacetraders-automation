@@ -1,0 +1,29 @@
+.header {
+    display: flex;
+}
+
+.collapse-icon {
+    margin-left: 16px;
+    margin-right: 16px;
+    align-self: center;
+}
+
+.menu {
+    position: relative;
+    box-shadow: #e4ecef;
+
+    .ant-menu-horizontal {
+        & > .ant-menu-submenu {
+            float: right;
+        }
+
+        border: none;
+    }
+
+    .ant-menu-submenu-title {
+        width: 6vh;
+        height: 6vh;
+        text-align: center;
+        padding-top: 1vh;
+    }
+}
