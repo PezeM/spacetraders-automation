@@ -1,10 +1,10 @@
 import React from 'react';
 import './App.css';
 import useSWR, {SWRConfig} from 'swr';
+import {BASE_PORT, BASE_URL} from "./constants/server";
 
-const baseUrl = 'http://localhost:8081'
-
-const fetcher = (url: string, ...args: any[]) => fetch(`${baseUrl}/${url}`, ...args).then(res => res.json());
+const fetcher = (port: number | string, url: string, ...args: any[]) =>
+    fetch(`${BASE_URL}:${port}/${url}`, ...args).then(res => res.json());
 
 const TestUser = () => {
     const {data, error, mutate} = useSWR('user/', {refreshInterval: 1000});
@@ -28,7 +28,7 @@ const TestUser = () => {
 function App() {
     return (
         <SWRConfig value={{
-            fetcher,
+            fetcher: (url, ...args: any[]) => fetcher(BASE_PORT, url, ...args),
             revalidateOnFocus: true
         }}>
             <div className="App">
