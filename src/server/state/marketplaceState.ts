@@ -39,7 +39,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
     }
 
     getMarketplaceData(symbol: string) {
-        return this._data.get<PlanetMarketplace>(symbol);
+        return symbol ? this._data.get<PlanetMarketplace>(symbol) : undefined;
     }
 
     async getOrCreatePlanetMarketplace(location: string): Promise<PlanetMarketplace> {

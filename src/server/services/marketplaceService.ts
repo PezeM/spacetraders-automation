@@ -72,7 +72,7 @@ class MarketplaceService implements IInitializeable {
             const ship = ships.find(s => !s.isTraveling && !s.isBusy);
             if (!ship) continue;
 
-            await this.visitLocation(ship, location, visitedLocations, shipActionService, marketplaceState);
+            this.visitLocation(ship, location, visitedLocations, shipActionService, marketplaceState);
         }
 
         this._loopFinished = visitedLocations.length === locations.length && ships.every(s => !s.isBusy);
@@ -90,11 +90,12 @@ class MarketplaceService implements IInitializeable {
 
             // Get marketplace data
             const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
+            console.log('marketplace response', marketplaceResponse);
             marketplaceState.addMarketplaceData(marketplaceResponse.location);
             logger.debug(`Fetched marketplace location from planet ${location.symbol}`);
             logger.debug('Most profitable', {mostProfitable: marketplaceState.bestProfit});
         } catch (e) {
-            logger.verbose(`Couldn't fetch marketplace in system ${location.symbol}`);
+            logger.verbose(`Couldn't fetch marketplace in system ${location.symbol}`, e);
         }
 
         ship.isTraveling = false;
