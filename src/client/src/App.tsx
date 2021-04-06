@@ -1,15 +1,18 @@
 import React from 'react';
 import './App.css';
 import {SWRConfig} from 'swr';
-import {BASE_PORT} from "./constants/server";
 import {fetcher} from "./api";
 import {BrowserRouter, Switch} from "react-router-dom";
 import {MainLayout} from "./views/mainLayout";
+import {selectSettings} from "./features/settings/settingsSlice";
+import {useSelector} from "react-redux";
 
 function App() {
+    const settings = useSelector(selectSettings);
+
     return (
         <SWRConfig value={{
-            fetcher: (url, ...args: any[]) => fetcher(BASE_PORT, url, ...args),
+            fetcher: (url, ...args: any[]) => fetcher(settings.port, url, ...args),
             revalidateOnFocus: true
         }}>
             <BrowserRouter>
