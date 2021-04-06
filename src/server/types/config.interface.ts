@@ -19,6 +19,7 @@ export interface IConfig {
         minMoneyLeftAfterLoanPayment: number;
     },
     expressServerPort: number;
+    blockedTradeItems: GoodType[];
 }
 
 export interface ITradeData {

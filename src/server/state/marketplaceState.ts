@@ -70,6 +70,12 @@ export class MarketplaceState extends BaseState<NodeCache> {
             }
         }
 
+        const blockedTrades = CONFIG.get('blockedTradeItems');
+        if (blockedTrades && blockedTrades.length > 0) {
+            // Remove blocked trades from source
+            source = source.filter(t => !blockedTrades.includes(t.symbol));
+        }
+
         return source.sort((a, b) =>
             (b[sortedBy] ?? b["profitPerItem"]) - (a[sortedBy] ?? a["profitPerItem"]));
     }
@@ -150,18 +156,20 @@ export class MarketplaceState extends BaseState<NodeCache> {
     }
 
     private computeBestSellers() {
-        const bestSellers = this.marketplaceSellersComputation((a, b) => a.pricePerUnit > b.pricePerUnit);
+        const bestSellers = this.marketplaceSellersComputation(
+            (a, b) => a.pricePerUnit > b.pricePerUnit, false);
         this._bestSellers = bestSellers;
         return bestSellers;
     }
 
     private computeBestBuyers() {
-        const bestBuyer = this.marketplaceSellersComputation((a, b) => a.pricePerUnit < b.pricePerUnit);
+        const bestBuyer = this.marketplaceSellersComputation(
+            (a, b) => a.pricePerUnit < b.pricePerUnit);
         this._bestBuyers = bestBuyer;
         return bestBuyer;
     }
 
-    private marketplaceSellersComputation(priceCheck: (a: MarketplaceSeller, b: Marketplace) => boolean) {
+    private marketplaceSellersComputation(priceCheck: (a: MarketplaceSeller, b: Marketplace) => boolean, buying = true) {
         const sellersMap = new Map<GoodType, MarketplaceSeller>();
 
         for (const key of this._data.keys()) {

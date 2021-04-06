@@ -17,8 +17,8 @@ export const getBestTrade = (marketplaceState: MarketplaceState, ship: UserShip,
     }
 
     const bestMarketTrade = marketplaceState.getBestTradeBy(CONFIG.get('sortProfitBy'), strategy, ship);
-    if (bestMarketTrade && (bestMarketTrade.buy.available
-        / (!bestMarketTrade.buy.volumePerUnit ? 1 : bestMarketTrade.buy.volumePerUnit) > 300))
+    if (bestMarketTrade
+        && (bestMarketTrade.buy.available / (!bestMarketTrade.buy.volumePerUnit ? 1 : bestMarketTrade.buy.volumePerUnit) > 300))
         return marketplaceProfitToTradeData(bestMarketTrade);
 
     return CONFIG.has('defaultTrade') ? CONFIG.get('defaultTrade') as ITradeData : defaultTrade;

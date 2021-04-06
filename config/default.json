@@ -18,5 +18,6 @@
   "payLoans": {
     "minMoneyLeftAfterLoanPayment": 200000
   },
-  "expressServerPort": 8081
+  "expressServerPort": 8081,
+  "blockedTradeItems": []
 }
