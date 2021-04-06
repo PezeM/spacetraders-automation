@@ -99,5 +99,5 @@ export const calculateRequiredFuel = (source: Pick<Location, 'x' | 'y' | 'type'>
 export const calculateTravelTime = (shipSpeed: number, source: IVector2, dest: IVector2): number => {
     const dist = distance(source, dest);
 
-    return Math.round(((15 / shipSpeed) * Math.round(dist)) + 59);
+    return Math.round(((2 / shipSpeed) * Math.round(dist)) + 59);
 }
