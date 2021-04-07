@@ -9,7 +9,8 @@ interface ConfigKey {
 
 export const DEFAULT_SETTINGS: AppSettings = {
     baseUrl: 'http://localhost',
-    port: 8080
+    port: 8080,
+    theme: "dark"
 }
 
 const settingsSlice = createSlice({

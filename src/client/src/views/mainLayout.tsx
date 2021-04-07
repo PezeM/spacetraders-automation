@@ -18,13 +18,13 @@ export const MainLayout = () => {
         <Layout style={{minHeight: '100vh'}}>
             <SideMenu collapsed={sideMenuCollapsed} handleOnCollapse={handleSideMenuCollapse}/>
 
-            <Layout>
+            <Layout style={{overflow: "auto", height: "100vh"}}>
                 <LayoutNavbar
                     collapsed={sideMenuCollapsed}
                     handleOnCollapse={handleSideMenuCollapse}
                 />
 
-                <Content style={{margin: '24px 16px 0'}}>
+                <Content style={{margin: '24px 16px 0', overflow: "auto", height: "100vh"}}>
                     <div style={{padding: 24, background: '#fff', minHeight: 20}}>
                         {/* Routing here */}
 

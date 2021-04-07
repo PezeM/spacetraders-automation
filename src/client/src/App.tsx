@@ -12,7 +12,7 @@ function App() {
 
     return (
         <SWRConfig value={{
-            fetcher: (url, ...args: any[]) => fetcher(settings.port, url, ...args),
+            fetcher: (url, ...args: any[]) => fetcher(settings.baseUrl, settings.port, url, ...args),
             revalidateOnFocus: true
         }}>
             <BrowserRouter>

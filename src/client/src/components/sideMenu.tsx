@@ -9,6 +9,8 @@ import {
     TeamOutlined,
 } from '@ant-design/icons';
 import {Key} from "antd/es/table/interface";
+import {useSelector} from "react-redux";
+import {selectSettings} from "../features/settings/settingsSlice";
 
 const {SubMenu} = Menu;
 
@@ -20,7 +22,7 @@ interface Props {
 }
 
 export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
-    const theme = 'dark';
+    const theme = useSelector(selectSettings).theme;
     const history = useHistory();
 
     const handleSideMenuClick = (action: { item: ReactInstance, key: Key, keyPath: Key[] }) => {
@@ -55,15 +57,22 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
             collapsed={collapsed}
             width="256"
             theme={theme}
+            style={{
+                overflow: 'auto',
+                height: '100vh',
+                left: 0,
+            }}
         >
             <a>
                 <div className="menu-logo"/>
             </a>
+
             <Menu mode="inline" theme={theme} onClick={handleSideMenuClick}>
                 <Menu.Item key="dashboard">
                     <DashboardOutlined/>
                     <span className="nav-text">Dashboard</span>
                 </Menu.Item>
+
                 <SubMenu
                     key="products"
                     title={
@@ -80,6 +89,7 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                         <span className="nav-text">Add Product</span>
                     </Menu.Item>
                 </SubMenu>
+
                 <SubMenu
                     key="customers"
                     title={
@@ -96,10 +106,12 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                         <span className="nav-text">Add Customer</span>
                     </Menu.Item>
                 </SubMenu>
+
                 <Menu.Item key="settings">
                     <SettingOutlined/>
                     <span className="nav-text">Settings</span>
                 </Menu.Item>
+
                 <Menu.Item key="reports">
                     <FundProjectionScreenOutlined/>
                     <span className="nav-text">Reports</span>
