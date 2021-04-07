@@ -11,6 +11,7 @@ import {
 import {Layout, Menu, Badge} from 'antd';
 import {UserAvatar} from "../userAvatar";
 import './style.scss';
+import {useHistory} from "react-router-dom";
 
 const {Header} = Layout;
 const {SubMenu} = Menu;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => {
+    const history = useHistory();
 
     const getCollapseIcon = () => {
         if (collapsed) {
@@ -35,9 +37,12 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
         console.log('Menu click');
     };
 
-    // const handleSettingMenuClick = () => {
-    //
-    // };
+    const handleProfileClick = (data: any) => {
+        const path = data.key;
+        if (path) {
+            history.push(path);
+        }
+    }
 
     return (
         <Header className="header" style={{background: '#fff', padding: 0}}>
@@ -93,15 +98,15 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 </SubMenu>
             </Menu>
 
-            <Menu onClick={handleLanguageMenuClick} mode="horizontal" className="menu">
+            <Menu onClick={handleProfileClick} mode="horizontal" className="menu">
                 <SubMenu title={UserAvatar('PezeM')}>
-                    <Menu.Item key="setting:1">
+                    <Menu.Item key="settings">
                         <span>
                           <UserOutlined/>
                           Profile
                         </span>
                     </Menu.Item>
-                    <Menu.Item key="setting:2">
+                    <Menu.Item key="logout">
                         <span>
                           <LogoutOutlined onClick={handleLanguageMenuClick}/>
                           Logout

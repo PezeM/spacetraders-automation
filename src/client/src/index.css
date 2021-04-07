@@ -12,3 +12,13 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.menu-logo {
+    background-image: url('./images/logo.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 35px;
+    background-size: 75%;
+    margin: 20px;
+    color: #ffffff;
+}

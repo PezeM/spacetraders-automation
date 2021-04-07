@@ -4,6 +4,7 @@ import {Layout} from "antd";
 import {SideMenu} from "../components/sideMenu";
 import {Route, Switch} from "react-router-dom";
 import {LayoutNavbar} from "../components/navbar";
+import {SettingsView} from "./settings";
 
 const {Content} = Layout;
 
@@ -35,6 +36,8 @@ export const MainLayout = () => {
                                     <TestComponent/>
                                 </div>
                             </Route>
+
+                            <Route path='/settings' component={SettingsView} />
                         </Switch>
                     </div>
                 </Content>
