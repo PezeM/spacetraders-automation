@@ -30,14 +30,8 @@ export const MainLayout = () => {
                         {/* Routing here */}
 
                         <Switch>
-                            <Route path='/' exact>
-                                Eluwa
-                                <div className="App">
-                                    <TestComponent/>
-                                </div>
-                            </Route>
-
-                            <Route path='/settings' component={SettingsView} />
+                            <Route path='/' exact component={TestComponent}/>
+                            <Route path='/settings' component={SettingsView}/>
                         </Switch>
                     </div>
                 </Content>

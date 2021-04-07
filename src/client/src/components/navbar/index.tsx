@@ -5,13 +5,12 @@ import {
     QuestionCircleOutlined,
     GlobalOutlined,
     BellOutlined,
-    UserOutlined,
-    LogoutOutlined,
+    LogoutOutlined, SettingOutlined,
 } from '@ant-design/icons';
 import {Layout, Menu, Badge} from 'antd';
 import {UserAvatar} from "../userAvatar";
-import './style.scss';
 import {useHistory} from "react-router-dom";
+import './style.scss';
 
 const {Header} = Layout;
 const {SubMenu} = Menu;
@@ -26,10 +25,9 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
 
     const getCollapseIcon = () => {
         if (collapsed) {
-            return (
-                <MenuUnfoldOutlined onClick={handleOnCollapse} className="collapse-icon"/>
-            );
+            return <MenuUnfoldOutlined onClick={handleOnCollapse} className="collapse-icon"/>;
         }
+
         return <MenuFoldOutlined onClick={handleOnCollapse} className="collapse-icon"/>;
     };
 
@@ -102,8 +100,8 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 <SubMenu title={UserAvatar('PezeM')}>
                     <Menu.Item key="settings">
                         <span>
-                          <UserOutlined/>
-                          Profile
+                          <SettingOutlined/>
+                          Settings
                         </span>
                     </Menu.Item>
                     <Menu.Item key="logout">
