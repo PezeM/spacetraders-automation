@@ -5,8 +5,9 @@ import {getColorOfGood} from "../../../helpers/goods";
 import {Cargo} from "spacetraders-api-sdk";
 import {BooleanIconColumn} from "../../table/booleanIconColumn";
 import Highlighter from 'react-highlight-words';
-import {EditOutlined, SearchOutlined} from '@ant-design/icons';
+import {SearchOutlined} from '@ant-design/icons';
 import {sumShipCargoQuantity} from "../../../helpers/ship";
+import {getUniqueValuesFromArray} from "../../../helpers/arrays";
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE_NUMBER = 0;
@@ -40,96 +41,112 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
         setSearchText('');
     }
 
-    const getColumnSearchProps = (dataIndex: string) => ({
-        // @ts-ignore
-        filterDropdown({setSelectedKeys, selectedKeys, confirm, clearFilters}) {
-            return (
-                <div style={{padding: 8}}>
-                    <Input
-                        placeholder={`Filter ${dataIndex}`}
-                        value={selectedKeys[0]}
-                        onChange={(e) =>
-                            setSelectedKeys(e.target.value ? [e.target.value] : [])
-                        }
-                        onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        style={{width: 188, marginBottom: 8, display: 'block'}}
+    function getColumnSearchProps<T extends keyof Ship>(dataIndex: T) {
+        return ({
+            // @ts-ignore
+            filterDropdown({setSelectedKeys, selectedKeys, confirm, clearFilters}) {
+                return (
+                    <div style={{padding: 8}}>
+                        <Input
+                            placeholder={`Filter ${dataIndex}`}
+                            value={selectedKeys[0]}
+                            onChange={(e) =>
+                                setSelectedKeys(e.target.value ? [e.target.value] : [])
+                            }
+                            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                            style={{width: 188, marginBottom: 8, display: 'block'}}
+                        />
+                        <Space>
+                            <Button
+                                type="primary"
+                                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                                icon={<SearchOutlined/>}
+                                size="small"
+                                style={{width: 90}}
+                            >
+                                Search
+                            </Button>
+                            <Button
+                                onClick={() => handleReset(clearFilters)}
+                                size="small"
+                                style={{width: 90}}
+                            >
+                                Reset
+                            </Button>
+                        </Space>
+                    </div>
+                );
+            },
+            filterIcon(filtered: boolean) {
+                return (
+                    <SearchOutlined style={{color: filtered ? '#1890ff' : undefined}}/>
+                );
+            },
+            onFilter(value: any, record: any) {
+                return record[dataIndex]
+                    ? record[dataIndex]
+                        .toString()
+                        .toLowerCase()
+                        .includes(value.toLowerCase())
+                    : '';
+            },
+            render(text: string) {
+                return searchedColumn === dataIndex ? (
+                    <Highlighter
+                        highlightStyle={{backgroundColor: '#ffc069', padding: 0}}
+                        searchWords={[searchText]}
+                        autoEscape
+                        textToHighlight={text ? text.toString() : ''}
                     />
-                    <Space>
-                        <Button
-                            type="primary"
-                            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                            icon={<SearchOutlined/>}
-                            size="small"
-                            style={{width: 90}}
-                        >
-                            Search
-                        </Button>
-                        <Button
-                            onClick={() => handleReset(clearFilters)}
-                            size="small"
-                            style={{width: 90}}
-                        >
-                            Reset
-                        </Button>
-                    </Space>
-                </div>
-            );
-        },
-        filterIcon(filtered: boolean) {
-            return (
-                <SearchOutlined style={{color: filtered ? '#1890ff' : undefined}}/>
-            );
-        },
-        onFilter(value: string, record: any) {
-            return record[dataIndex]
-                ? record[dataIndex]
-                    .toString()
-                    .toLowerCase()
-                    .includes(value.toLowerCase())
-                : '';
-        },
-        render(text: string) {
-            return searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{backgroundColor: '#ffc069', padding: 0}}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            );
-        },
-    });
+                ) : (
+                    text
+                );
+            },
+        });
+    }
 
     const columns = [
         {
             title: 'Id',
             dataIndex: 'id',
-            sorter: (a: Ship, b: Ship) => a.id.localeCompare(b.id)
+            sorter: (a: Ship, b: Ship) => a.id.localeCompare(b.id),
+            ...getColumnSearchProps('id')
         },
         {
             title: 'Location',
             dataIndex: 'location',
-            sorter: (a: Ship, b: Ship) => a.location.localeCompare(b.location)
-
+            sorter: (a: Ship, b: Ship) => a.location.localeCompare(b.location),
+            ...getColumnSearchProps('location')
         },
         {
             title: 'Type',
             dataIndex: 'type',
-            sorter: (a: Ship, b: Ship) => a.type.localeCompare(b.type)
+            sorter: (a: Ship, b: Ship) => a.type.localeCompare(b.type),
+            ...getColumnSearchProps('type')
         },
         {
             title: 'Busy',
             dataIndex: 'isBusy',
             render: (data: boolean) => <BooleanIconColumn status={data}/>,
-            sorter: (a: Ship, b: Ship) => Number(a.isBusy) - Number(b.isBusy)
+            sorter: (a: Ship, b: Ship) => Number(a.isBusy) - Number(b.isBusy),
+            filters: getUniqueValuesFromArray(ships, 'isBusy')
+                .map(v => {
+                    return {value: v, text: v ? 'True' : 'False'}
+                }),
+            filterMultiple: true,
+            onFilter: (value: any, ship: Ship) => ship.isBusy === value
         },
         {
             title: 'Scout ship',
             dataIndex: 'isScoutShip',
             render: (data: boolean) => <BooleanIconColumn status={data}/>,
-            sorter: (a: Ship, b: Ship) => Number(a.isScoutShip) - Number(b.isScoutShip)
+            sorter: (a: Ship, b: Ship) => Number(a.isScoutShip) - Number(b.isScoutShip),
+            filters: getUniqueValuesFromArray(ships, 'isScoutShip')
+                .map(v => {
+                    return {value: v, text: v ? 'True' : 'False'}
+                }),
+            filterMultiple: true,
+            onFilter: (value: any, ship: Ship) => ship.isScoutShip === value
         },
         {
             title: 'Cargo',
@@ -145,6 +162,12 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
                     })}
                 </>
             ),
+            filters: getUniqueValuesFromArray(getUniqueValuesFromArray(ships, 'cargo'), 'good')
+                .map(v => {
+                    return {value: v, text: v}
+                }),
+            filterMultiple: true,
+            onFilter: (value: any, ship: Ship) => ship.cargo?.some(c => c.good === value),
             sorter: (a: Ship, b: Ship) => {
                 if (!a.cargo || !b.cargo) return 0;
                 return sumShipCargoQuantity(a) - sumShipCargoQuantity(b);
