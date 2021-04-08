@@ -5,6 +5,8 @@ import {SideMenu} from "../components/sideMenu";
 import {Route, Switch} from "react-router-dom";
 import {LayoutNavbar} from "../components/navbar";
 import {SettingsView} from "./settings";
+import {ROUTES} from "../constants/routes";
+import {OwnShips} from "./ownShips";
 
 const {Content} = Layout;
 
@@ -30,8 +32,9 @@ export const MainLayout = () => {
                         {/* Routing here */}
 
                         <Switch>
-                            <Route path='/' exact component={TestComponent}/>
-                            <Route path='/settings' component={SettingsView}/>
+                            <Route path={ROUTES.Dashboard} exact component={TestComponent}/>
+                            <Route path={ROUTES.Settings} component={SettingsView}/>
+                            <Route path={ROUTES.OwnShips} component={OwnShips}/>
                         </Switch>
                     </div>
                 </Content>
