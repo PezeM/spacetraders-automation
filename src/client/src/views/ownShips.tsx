@@ -1,8 +1,9 @@
 import React from 'react';
 import useSWR from "swr";
 import {Ship} from "../../../server/models/ship";
-import {Loader} from "../components/loader";
 import {Result} from "antd";
+import {Loader} from "../components/loader";
+import {OwnShipTable} from "../components/ships/ownShips/table";
 
 export const OwnShips = () => {
     const {data, error} = useSWR<Ship[]>('ship/');
@@ -11,10 +12,8 @@ export const OwnShips = () => {
     if (error) return <Result status="error" title="Couldn't fetch ships"/>;
 
     return (
-        <div>Test
-            <pre>
-                {JSON.stringify(data, null, 2)}
-            </pre>
+        <div>
+            <OwnShipTable ships={data}/>
         </div>
     )
 }
