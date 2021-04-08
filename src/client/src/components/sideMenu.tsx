@@ -1,6 +1,6 @@
 import React, {ReactInstance} from 'react';
 import {Layout, Menu} from 'antd';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useLocation} from 'react-router-dom';
 import {
     DashboardOutlined,
     FundProjectionScreenOutlined,
@@ -11,6 +11,7 @@ import {
 import {Key} from "antd/es/table/interface";
 import {useSelector} from "react-redux";
 import {selectSettings} from "../features/settings/settingsSlice";
+import {ROUTES} from "../constants/routes";
 
 const {SubMenu} = Menu;
 
@@ -24,6 +25,7 @@ interface Props {
 export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
     const theme = useSelector(selectSettings).theme;
     const history = useHistory();
+    const location = useLocation();
 
     const handleSideMenuClick = (action: { item: ReactInstance, key: Key, keyPath: Key[] }) => {
         console.log('menu:', action);
@@ -67,8 +69,8 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                 <div className="menu-logo"/>
             </a>
 
-            <Menu mode="inline" theme={theme} onClick={handleSideMenuClick}>
-                <Menu.Item key="dashboard">
+            <Menu mode="inline" theme={theme} onClick={handleSideMenuClick} selectedKeys={[location.pathname]}>
+                <Menu.Item key={ROUTES.Dashboard}>
                     <DashboardOutlined/>
                     <span className="nav-text">Dashboard</span>
                 </Menu.Item>

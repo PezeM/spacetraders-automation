@@ -9,8 +9,9 @@ import {
 } from '@ant-design/icons';
 import {Layout, Menu, Badge} from 'antd';
 import {UserAvatar} from "../userAvatar";
-import {useHistory} from "react-router-dom";
+import {useHistory, useLocation} from "react-router-dom";
 import './style.scss';
+import {ROUTES} from "../../constants/routes";
 
 const {Header} = Layout;
 const {SubMenu} = Menu;
@@ -22,6 +23,7 @@ interface Props {
 
 export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => {
     const history = useHistory();
+    const location = useLocation();
 
     const getCollapseIcon = () => {
         if (collapsed) {
@@ -59,6 +61,7 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 onClick={handleLanguageMenuClick}
                 mode="horizontal"
                 className="menu"
+                selectedKeys={[location.pathname]}
             >
                 <SubMenu title={<QuestionCircleOutlined/>}/>
             </Menu>
@@ -67,6 +70,7 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 onClick={handleLanguageMenuClick}
                 mode="horizontal"
                 className="menu"
+                selectedKeys={[location.pathname]}
             >
                 <SubMenu
                     title={
@@ -81,6 +85,7 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 onClick={handleLanguageMenuClick}
                 mode="horizontal"
                 className="menu"
+                selectedKeys={[location.pathname]}
             >
                 <SubMenu title={<GlobalOutlined/>}>
                     <Menu.Item key="en">
@@ -96,9 +101,9 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 </SubMenu>
             </Menu>
 
-            <Menu onClick={handleProfileClick} mode="horizontal" className="menu">
+            <Menu onClick={handleProfileClick} mode="horizontal" className="menu" selectedKeys={[location.pathname]}>
                 <SubMenu title={UserAvatar('PezeM')}>
-                    <Menu.Item key="settings">
+                    <Menu.Item key={ROUTES.Settings}>
                         <span>
                           <SettingOutlined/>
                           Settings
