@@ -34,26 +34,6 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
         if (path) {
             history.push(path.toString());
         }
-
-        // switch (action.key) {
-        //     case 'dashboard':
-        //         history.push('/');
-        //         break;
-        //     case 'showProducts':
-        //         history.push('/products');
-        //         break;
-        //     case 'addProduct':
-        //         history.push('/add-product');
-        //         break;
-        //     case 'showCustomers':
-        //         history.push('/customers');
-        //         break;
-        //     case 'addCustomer':
-        //         history.push('/add-customer');
-        //         break;
-        //     default:
-        //         history.push('/');
-        // }
     };
 
     return (
@@ -83,6 +63,11 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                 <Menu.Item key={ROUTES.OwnShips}>
                     <SettingOutlined/>
                     <span className="nav-text">Own ships</span>
+                </Menu.Item>
+
+                <Menu.Item key={ROUTES.ShipShop}>
+                    <SettingOutlined/>
+                    <span className="nav-text">Shipyard</span>
                 </Menu.Item>
 
                 <SubMenu

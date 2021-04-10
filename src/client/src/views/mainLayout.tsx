@@ -7,6 +7,7 @@ import {LayoutNavbar} from "../components/navbar";
 import {SettingsView} from "./settings";
 import {ROUTES} from "../constants/routes";
 import {OwnShips} from "./ownShips";
+import {ShipsShop} from "./shipsShop";
 
 const {Content} = Layout;
 
@@ -35,6 +36,7 @@ export const MainLayout = () => {
                             <Route path={ROUTES.Dashboard} exact component={TestComponent}/>
                             <Route path={ROUTES.Settings} component={SettingsView}/>
                             <Route path={ROUTES.OwnShips} component={OwnShips}/>
+                            <Route path={ROUTES.ShipShop} component={ShipsShop}/>
                         </Switch>
                     </div>
                 </Content>
