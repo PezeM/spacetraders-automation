@@ -93,7 +93,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
             const bestSell = this._bestSellers.get(key);
             if (!bestSell || bestSell.pricePerUnit === value.pricePerUnit) return;
 
-            const gainPerItem = bestSell.pricePerUnit - value.pricePerUnit;
+            const gainPerItem = (bestSell.pricePerUnit - value.pricePerUnit) ?? 0;
             const dist = Math.round(distance(value.location, bestSell.location));
             const distFactor = dist * PROFIT_DIST_MULT;
 
@@ -107,9 +107,9 @@ export class MarketplaceState extends BaseState<NodeCache> {
                 symbol: key,
                 buy: value,
                 sell: bestSell,
-                profitPerItem: profit.gainPerItem / distFactor,
-                profitPerVolume: profit.gainPerVolume / distFactor,
-                profitPerItemPercentage: profit.gainPerItemPercentage / distFactor,
+                profitPerItem: (profit.gainPerItem / distFactor) ?? 0,
+                profitPerVolume: (profit.gainPerVolume / distFactor) ?? 0,
+                profitPerItemPercentage: (profit.gainPerItemPercentage / distFactor) ?? 0,
                 distance: dist,
                 ...profit
             });
@@ -128,7 +128,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
             const bestBuy = this._bestBuyers.get(key);
             if (!bestBuy || bestBuy.pricePerUnit === value.pricePerUnit) return;
 
-            const gainPerItem = value.pricePerUnit - bestBuy.pricePerUnit;
+            const gainPerItem = (value.pricePerUnit - bestBuy.pricePerUnit) ?? 0;
             const dist = Math.round(distance(value.location, bestBuy.location));
             const distFactor = dist * PROFIT_DIST_MULT;
 
@@ -183,7 +183,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
                 if (addedProduct && priceCheck(addedProduct, product)) continue;
 
                 sellersMap.set(product.symbol, {
-                    pricePerUnit: product.pricePerUnit,
+                    pricePerUnit: buying ? product.purchasePricePerUnit : product.sellPricePerUnit,
                     volumePerUnit: product.volumePerUnit,
                     available: product.quantityAvailable,
                     location: {
