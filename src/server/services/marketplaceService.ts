@@ -31,6 +31,7 @@ class MarketplaceService implements IInitializeable {
     private async fetchMarketplace(game: IGame) {
         const {locationState, userState, shipShopState} = game.state;
 
+        await locationState.isInitialized;
         let shipsToScrapMarket = CONFIG.get('shipsToScrapMarket');
         if (shipsToScrapMarket === "MAX") shipsToScrapMarket = locationState.data.length;
 

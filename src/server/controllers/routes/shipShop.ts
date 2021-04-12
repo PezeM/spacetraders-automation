@@ -7,7 +7,7 @@ export const shipShopRoutes = (game: IGame) => {
     const shipShopController = new ShipShopController(game);
 
     router.get('/', shipShopController.getShips);
-    router.put('/buy', shipShopController.buyShip);
+    router.post('/buy', shipShopController.buyShip);
 
     return router;
 }

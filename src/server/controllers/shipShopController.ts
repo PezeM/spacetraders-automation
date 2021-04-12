@@ -29,8 +29,8 @@ export class ShipShopController extends BaseController {
         }
 
         try {
-            await buyShip(this._game.state.userState, location, shipType);
-            res.status(200);
+            const ship = await buyShip(this._game.state.userState, location, shipType);
+            res.status(201).send({ship, text: "Bought ship successfully"});
         } catch (e) {
             res.status(400).send(e.toString());
         }
