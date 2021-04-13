@@ -6,6 +6,7 @@ import {ChipIcon} from "../../icons/chipIcon";
 import {TruckIcon} from "../../icons/truckIcon";
 import {SparklesIcon} from "../../icons/sparklesIcon";
 import {useApiHook} from "../../../api/apiHook";
+import {Ship} from "../../../../../server/models/ship";
 
 const {Text} = Typography;
 
@@ -28,7 +29,7 @@ export const ShipyardCard: React.FC<Props> = ({ship, index}) => {
         setIsLoading(true);
 
         try {
-            const result = await makeRequest<any>('ship-shop/buy', "POST", {
+            await makeRequest<Ship>('ship-shop/buy', "POST", {
                 shipType: ship.type,
                 location: buyLocation
             });

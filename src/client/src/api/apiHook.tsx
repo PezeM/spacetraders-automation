@@ -2,6 +2,8 @@ import React from 'react';
 import {useSelector} from "react-redux";
 import {selectSettings} from "../features/settings/settingsSlice";
 import {RequestMethod} from "./index";
+import {InvalidApiResponse} from "../../../server/types/api.interface";
+import {ApiError} from "./apiError";
 
 export const useApiHook = () => {
     const settings = useSelector(selectSettings);
@@ -21,7 +23,8 @@ export const useApiHook = () => {
         });
 
         if (!response.ok) {
-            throw new Error(response.status.toString());
+            const error = JSON.parse(await response.text()) as InvalidApiResponse;
+            throw new ApiError(response.status, response.statusText, error.errors);
         }
 
         const result = await response.json();
