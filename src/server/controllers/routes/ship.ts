@@ -10,6 +10,7 @@ export const shipRoutes = (game: IGame) => {
     router.get('/ship/:id', shipController.getShip);
     router.get('/cheapest-ship', shipController.getCheapestShip);
     router.get('/best-trade', shipController.getBestTradeForShip);
+    router.delete('/:id', shipController.sellShip);
 
     return router;
 }

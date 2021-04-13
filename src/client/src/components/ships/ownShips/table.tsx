@@ -8,6 +8,8 @@ import Highlighter from 'react-highlight-words';
 import {SearchOutlined} from '@ant-design/icons';
 import {sumShipCargoQuantity} from "../../../helpers/ship";
 import {getUniqueValuesFromArray} from "../../../helpers/arrays";
+import {useShipActionMenu} from "../../table/shipActionMenu";
+import {Key} from "antd/es/table/interface";
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE_NUMBER = 0;
@@ -19,8 +21,18 @@ interface Props {
 export const OwnShipTable: React.FC<Props> = ({ships}) => {
     const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE_NUMBER);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+    const [selectedRow, setSelectedRow] = useState<Ship | undefined>(undefined);
     const [searchText, setSearchText] = useState<string>('');
     const [searchedColumn, setSearchedColumn] = useState<string>('');
+    const [actionColumnView] = useShipActionMenu({selectedRow});
+
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: (selectedRowKeys: Key[]) => {
+            setSelectedRowKeys(selectedRowKeys);
+        },
+    };
 
     const resetPagination = () => {
         setCurrentPage(DEFAULT_PAGE_NUMBER);
@@ -172,16 +184,28 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
                 if (!a.cargo || !b.cargo) return 0;
                 return sumShipCargoQuantity(a) - sumShipCargoQuantity(b);
             },
-        }
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: () => actionColumnView,
+        },
     ]
-
 
     return (
         <Table
             rowKey={record => record.id}
+            rowSelection={rowSelection}
             dataSource={ships}
             columns={columns}
             onChange={handleTableChange}
+            onRow={record => {
+                return {
+                    onClick: () => {
+                        setSelectedRow(record);
+                    },
+                };
+            }}
             pagination={{
                 pageSize: DEFAULT_PAGE_SIZE,
                 current: currentPage + 1,
