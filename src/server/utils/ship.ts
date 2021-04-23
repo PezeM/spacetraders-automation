@@ -36,12 +36,13 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
 export const buyShip = async (userState: UserState, location: string, shipType: string): Promise<Ship> => {
     try {
         const result = await API.user.buyShip(location, shipType);
-        console.log(`Buy ship result`, JSON.stringify(result, null, 2));
-        const newShip = result.user.ships[result.user.ships.length - 1];
-        logger.info(`Bought new ship ${shipType} ${newShip.id}`, {shipId: newShip.id});
-        userState.updateData(result.user);
+        logger.info(`Bought new ship ${shipType} ${result.ship.id} for ${result.credits}`, {
+            shipId: result.ship.id,
+            credits: result.credits
+        });
+        userState.updateData(result);
         logger.info(userState.toString());
-        return userState.getShipById(newShip.id);
+        return userState.getShipById(result.ship.id);
     } catch (e) {
         logger.error(`Couldn't buy ship type ${shipType}. Remaining credit ${userState.data.credits}`);
         throw e;

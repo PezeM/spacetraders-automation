@@ -1,3 +1,3 @@
-import {LoanResponse, OrderResponse, User} from "spacetraders-api-sdk";
+import {LoanResponse, OrderResponse, ShipBuyResponse, User} from "spacetraders-api-sdk";
 
-export type ExtendedUserData = User & OrderResponse & LoanResponse;
+export type ExtendedUserData = User & OrderResponse & LoanResponse & ShipBuyResponse;

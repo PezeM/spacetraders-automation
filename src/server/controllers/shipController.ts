@@ -72,7 +72,7 @@ export class ShipController extends BaseController {
             await new UserService().syncUser(this._game.state.userState);
             res.status(201).json(createApiResponse("Successfully sold ship"));
         } catch (e) {
-            res.status(401).send(createApiErrorResponse('Must in in shipyard to sell ship.'));
+            res.status(401).send(createApiErrorResponse('Ship must in in shipyard to sell ship.'));
         }
     }
 }

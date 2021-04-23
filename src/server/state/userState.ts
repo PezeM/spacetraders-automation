@@ -64,6 +64,8 @@ export class UserState extends BaseState<GameUser> {
             const ship = this.data.ships.find(s => s.id === data.ship?.id);
             if (ship) {
                 ship.updateData(data.ship);
+            } else {
+                this._data.ships.push(Ship.createShip(data.ship));
             }
         }
 
