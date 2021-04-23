@@ -1,12 +1,13 @@
 import {Button, Card, Col, message, Modal, Radio, Row, Typography} from "antd";
 import React, {useState} from "react";
 import {ShopShip} from "spacetraders-api-sdk";
-import {ThunderboltOutlined, CreditCardOutlined, TagOutlined} from "@ant-design/icons";
+import {ThunderboltOutlined, CreditCardOutlined, TagOutlined, DollarOutlined} from "@ant-design/icons";
 import {ChipIcon} from "../../icons/chipIcon";
 import {TruckIcon} from "../../icons/truckIcon";
 import {SparklesIcon} from "../../icons/sparklesIcon";
 import {useApiHook} from "../../../api/apiHook";
 import {Ship} from "../../../../../server/models/ship";
+import {getSortedData} from "../../../helpers/arrays";
 
 const {Text} = Typography;
 
@@ -57,6 +58,7 @@ export const ShipyardCard: React.FC<Props> = ({ship, index}) => {
         <Col span={8}>
             <Modal title="Select buy location and price" visible={isModalVisible}
                    confirmLoading={isModalVisible}
+                   onCancel={closeModal}
                    footer={[
                        <Button key="back" onClick={closeModal}>
                            Cancel
@@ -91,6 +93,13 @@ export const ShipyardCard: React.FC<Props> = ({ship, index}) => {
                     </Col>
                     <Col span={12}>
                         {ship.class}
+                    </Col>
+
+                    <Col span={12}>
+                        <DollarOutlined/> <Text strong>Price</Text>
+                    </Col>
+                    <Col span={12}>
+                        ${getSortedData(ship.purchaseLocations, 'price')[0].price}
                     </Col>
 
                     <Col span={12}>
