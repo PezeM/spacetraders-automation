@@ -66,6 +66,13 @@ export class UserState extends BaseState<GameUser> {
                 ship.updateData(data.ship);
             }
         }
+
+        if (data.loan) {
+            const index = this.data.loans.findIndex(s => s.id === data.loan?.id);
+            if (index !== -1) {
+                this.data.loans[index] = {...data.loan};
+            }
+        }
     }
 
     getShipById(shipId: string): Ship {

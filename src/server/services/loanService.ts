@@ -20,7 +20,7 @@ export class LoanService {
         try {
             logger.info(`${game.username} is taking a loan of type ${loanType}`);
             const response = await API.user.requestLoan(loanType);
-            game.state.userState.updateData(response.user);
+            game.state.userState.updateData(response);
             logger.info(game.state.userState.toString());
             return true;
         } catch (e) {
