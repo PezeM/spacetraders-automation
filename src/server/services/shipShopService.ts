@@ -19,10 +19,6 @@ export class ShipShopService {
         const {userState, shipShopState} = this._state;
 
         await shipShopState.isInitialized;
-
-        let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
-        if (!minMoneyLeft || isNaN(minMoneyLeft)) return;
-
         const shipsToBuy = CONFIG.get('shipsToBuy');
 
         for (const [key, value] of Object.entries(shipsToBuy)) {
@@ -34,10 +30,10 @@ export class ShipShopService {
 
             // Check count of owned ships of type
             const ownedShips = userState.getShipsOfType(key);
-            let numberOfShipsToBuy = value - ownedShips.length;
+            let numberOfShipsToBuy = value.numberOfShips - ownedShips.length;
             if (numberOfShipsToBuy <= 0) continue;
 
-            console.log(`Need to buy ${numberOfShipsToBuy} of ship ${key}`);
+            let minMoneyLeft = value.minMoneyLeftAfterBuying ? value.minMoneyLeftAfterBuying : 30000;
             await this.buyShip(numberOfShipsToBuy, shipToBuy, userState, minMoneyLeft);
         }
     }

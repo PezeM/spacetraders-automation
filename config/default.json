@@ -11,7 +11,6 @@
     "destination": "OE-PM-TR",
     "itemToTrade": "SHIP_PLATING"
   },
-  "minMoneyLeftAfterBuyingShip": 10000,
   "sellNotUsedCargo": true,
   "cacheTTL": 300,
   "payLoans": {
@@ -20,8 +19,17 @@
   "expressServerPort": 8081,
   "blockedTradeItems": [],
   "shipsToBuy": {
-    "JW-MK-I": 4,
-    "GR-MK-I": 6,
-    "GR-MK-II": 10
+    "JW-MK-I": {
+      "numberOfShips": 5,
+      "minMoneyLeftAfterBuying": 50000
+    },
+    "GR-MK-I": {
+      "numberOfShips": 6,
+      "minMoneyLeftAfterBuying": 80000
+    },
+    "GR-MK-II": {
+      "numberOfShips": 30,
+      "minMoneyLeftAfterBuying": 150000
+    }
   }
 }

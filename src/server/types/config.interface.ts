@@ -19,7 +19,12 @@ export interface IConfig {
     },
     expressServerPort: number;
     blockedTradeItems: GoodType[];
-    shipsToBuy: Record<string, number>;
+    shipsToBuy: Record<string, ShipBuyInfo>;
+}
+
+export interface ShipBuyInfo {
+    numberOfShips: number;
+    minMoneyLeftAfterBuying: number;
 }
 
 export interface ITradeData {
