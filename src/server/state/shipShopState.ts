@@ -24,8 +24,12 @@ export class ShipShopState extends BaseState<ShopShip[]> {
         await this._isInitialized;
     }
 
+    getShip(type: string): ShopShip | undefined {
+        return this._data.find(s => s.type === type);
+    }
+
     getPriceOfShip(type: string): number | undefined {
-        const shipData = this._data.find(s => s.type === type);
+        const shipData = this.getShip(type);
         if (!shipData) return undefined;
         return shipData.purchaseLocations[0].price;
     }

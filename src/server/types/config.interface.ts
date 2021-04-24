@@ -11,7 +11,6 @@ export interface IConfig {
     marketplaceRefreshTimer: number;
     sortProfitBy: MarketplaceProfitType;
     defaultTrade?: ITradeData;
-    shipToBuy?: string;
     minMoneyLeftAfterBuyingShip: number;
     sellNotUsedCargo: boolean;
     cacheTTL: number;
@@ -20,6 +19,7 @@ export interface IConfig {
     },
     expressServerPort: number;
     blockedTradeItems: GoodType[];
+    shipsToBuy: Record<string, number>;
 }
 
 export interface ITradeData {

@@ -93,6 +93,10 @@ export class UserState extends BaseState<GameUser> {
         return this.data.ships.filter(s => s.isScoutShip === scoutShip);
     }
 
+    getShipsOfType(type: string): Ship[] {
+        return this._data.ships.filter(s => s.type === type);
+    }
+
     toString() {
         return `Credits: ${this._data.credits}`;
     }

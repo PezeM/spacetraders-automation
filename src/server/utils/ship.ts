@@ -7,6 +7,7 @@ import {GameState} from "../state/gameState";
 import {distance} from "./math";
 import {IVector2} from "../types/math.interface";
 import {Ship} from "../models/ship";
+import {getSortedData} from "./array";
 
 /**
  * Returns cheapest ship from ships list
@@ -17,9 +18,8 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
     if (shipType) {
         const ship = ships.find(s => s.type === shipType);
         if (ship) {
-            const cheapestPurchaseLocation = ship.purchaseLocations
-                .sort((a, b) => a.price - b.price)[0];
-            return {ship, purchaseLocation: cheapestPurchaseLocation};
+            const purchaseLocation = getSortedData(ship.purchaseLocations, 'price')[0];
+            return {ship, purchaseLocation: purchaseLocation};
         }
     }
 
@@ -36,9 +36,9 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
 export const buyShip = async (userState: UserState, location: string, shipType: string): Promise<Ship> => {
     try {
         const result = await API.user.buyShip(location, shipType);
-        logger.info(`Bought new ship ${shipType} ${result.ship.id} for ${result.credits}`, {
+        logger.info(`Bought new ship ${shipType} ${result.ship.id}`, {
             shipId: result.ship.id,
-            credits: result.credits
+            userCredits: result.credits
         });
         userState.updateData(result);
         logger.info(userState.toString());

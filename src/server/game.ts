@@ -1,28 +1,29 @@
 import {IGame} from "./types/game.interface";
 import {GameState} from "./state/gameState";
 import {API} from "./API";
-import {buyShip} from "./utils/ship";
 import {waitFor} from "./utils/general";
 import {UserStartupService} from "./services/userStartupService";
 import {CONFIG} from "./config";
 import logger from "./logger";
 import {marketplaceService} from "./services/marketplaceService";
 import {TradeService} from "./services/tradeService";
-import {LoanStatus} from "spacetraders-api-sdk/lib/types/user.enum";
 import {LoanService} from "./services/loanService";
 import {createExpressServer} from "./expressServer";
 import {UserService} from "./services/userService";
+import {ShipShopService} from "./services/shipShopService";
 
 export class Game implements IGame {
     public readonly state: GameState;
     private readonly _tradeService: TradeService;
     private _gameLoopInterval: NodeJS.Timeout;
     private _utilityInterval: NodeJS.Timeout;
+    private _shipShopService: ShipShopService;
 
     constructor(private _token: string, private _username: string) {
         logger.info('Initialized game instance');
         this.state = new GameState(this);
         this._tradeService = new TradeService(this);
+        this._shipShopService = new ShipShopService(this.state);
 
         API.game.isOnline()
             .then(async (isServerOnline) => {
@@ -74,26 +75,28 @@ export class Game implements IGame {
     }
 
     private utilityLoop = async () => {
-        const {userState, shipShopState} = this.state;
+        const {userState} = this.state;
+
+        await this._shipShopService.buyRequiredShips();
 
         // Buy ship
-        if (CONFIG.has('shipToBuy')) {
-            const shipToBuy = CONFIG.get('shipToBuy');
-            if (!shipToBuy) return;
-            let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
-            if (!minMoneyLeft || isNaN(minMoneyLeft)) return;
-
-            await shipShopState.isInitialized;
-            const ship = shipShopState.data.find(s => s.type === shipToBuy);
-            if (ship) {
-                const shipPrice = ship.purchaseLocations[0].price;
-                if (userState.data.credits - shipPrice > minMoneyLeft) {
-                    await buyShip(userState, ship.purchaseLocations[0].location, ship.type);
-                }
-            } else {
-                logger.warn(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`)
-            }
-        }
+        // if (CONFIG.has('shipToBuy')) {
+        //     const shipToBuy = CONFIG.get('shipToBuy');
+        //     if (!shipToBuy) return;
+        //     let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
+        //     if (!minMoneyLeft || isNaN(minMoneyLeft)) return;
+        //
+        //     await shipShopState.isInitialized;
+        //     const ship = shipShopState.data.find(s => s.type === shipToBuy);
+        //     if (ship) {
+        //         const shipPrice = ship.purchaseLocations[0].price;
+        //         if (userState.data.credits - shipPrice > minMoneyLeft) {
+        //             await buyShip(userState, ship.purchaseLocations[0].location, ship.type);
+        //         }
+        //     } else {
+        //         logger.warn(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`)
+        //     }
+        // }
 
         await new UserService().syncUser(userState);
 
