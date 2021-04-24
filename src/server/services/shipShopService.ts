@@ -20,6 +20,7 @@ export class ShipShopService {
 
         await shipShopState.isInitialized;
         const shipsToBuy = CONFIG.get('shipsToBuy');
+        if (!shipsToBuy) return;
 
         for (const [key, value] of Object.entries(shipsToBuy)) {
             const shipToBuy = shipShopState.getShip(key);

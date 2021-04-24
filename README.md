@@ -72,7 +72,7 @@ Spacetraders API username. Will create new account if token and username are not
 #### `logsDir: string`
 
 Name of the directory where logs will be saved. It will be created if it doesn't exist.
-shipsToScrapMarket
+
 #### `strategy: TradeStrategy`
 
 What strategy is used for trading, either `PROFIT` or `LOSS`. When `LOSS` is selected, app will make the worst trades possible.
@@ -95,13 +95,10 @@ All available types are in the interface [MarketplaceProfitPer](https://github.c
 
 Property to set default trade which is used when the marketplace data is not available (eg. not scrapped yet). Type is [ITradeData](https://github.com/PezeM/spacetraders-automation/blob/main/src/types/config.interface.ts).
 
-#### `shipToBuy?: string`
+#### `shipsToBuy: Record<string, ShipBuyInfo>`
 
-Name of the ship to buy. To disable this feature set the name to empty or undefined.
-
-#### `minMoneyLeftAfterBuyingShip: numer`
-
-Required number of money left after buying a ship.
+Object of ships to buy with required count of them and minimum money left after transaction. To disable this feature set the property to undefined.
+Object value is [ShipBuyInfo](https://github.com/PezeM/spacetraders-automation/blob/main/src/types/config.interface.ts).
 
 #### `sellNotUsedCargo: boolean`
 
@@ -114,6 +111,14 @@ Number in seconds of marketplace cache.
 #### `payLoans?: { minMoneyLeftAfterLoanPayment: number }`
 
 Enables/disables pay loan feature. `minMoneyLeftAfterLoanPayment` specifies how much money must be left before paying the loan.
+
+#### `expressServerPort: number`
+
+Port of the express server. Default is 8080.
+
+#### `blockedTradeItems: GoodType[]`
+
+List of items that won't be traded. For example `Research`. 
 
 ## License
 
