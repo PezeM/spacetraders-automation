@@ -89,6 +89,12 @@ export class UserState extends BaseState<GameUser> {
         this._data.ships[index] = Ship.createShipFromExist(this._data.ships[index], ship);
     }
 
+    removeShip(shipId: string) {
+        const index = this._data.ships.findIndex(s => s.id === shipId);
+        if (index <= -1) return;
+        this._data.ships.splice(index, 1);
+    }
+
     getShips(scoutShip = false) {
         return this.data.ships.filter(s => s.isScoutShip === scoutShip);
     }

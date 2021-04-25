@@ -1,23 +1,35 @@
-import {Dropdown, Menu, message, Popconfirm} from 'antd';
-import React from 'react';
-import {QuestionCircleOutlined, DeleteOutlined, DownOutlined, EditOutlined} from "@ant-design/icons";
+import {Dropdown, Menu, message, Modal, Popconfirm} from 'antd';
+import React, {useState} from 'react';
+import {QuestionCircleOutlined, DeleteOutlined, DownOutlined, EditOutlined, InfoOutlined} from "@ant-design/icons";
 import {Ship} from "../../../../server/models/ship";
 import {mutate} from "swr";
 import {useApiHook} from "../../api/apiHook";
-import {ApiError} from "../../api/apiError";
 
 interface Props {
     selectedRow?: Ship;
 }
 
-type Type = (props: Props) => JSX.Element[];
-
-export const useShipActionMenu: Type = ({selectedRow}) => {
+export const ShipActionMenu: React.FC<Props> = ({selectedRow}) => {
     const [makeRequest] = useApiHook();
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const handleMenuClick = (action: any) => {
         console.log(action);
+
+        if (action.key === 'show') {
+            showFullInfoModal();
+        }
     };
+
+    const showFullInfoModal = () => {
+        if (!selectedRow) return;
+
+        setModalVisible(true);
+    }
+
+    const closeModal = () => {
+        setModalVisible(false);
+    }
 
     const handleShipSell = async () => {
         if (!selectedRow) return;
@@ -38,6 +50,10 @@ export const useShipActionMenu: Type = ({selectedRow}) => {
                 <EditOutlined/>
                 Some action
             </Menu.Item>
+            <Menu.Item key="show">
+                <InfoOutlined/>
+                Show full info
+            </Menu.Item>
             <Menu.Item key="delete">
                 <Popconfirm
                     title="Sure to sell?"
@@ -52,15 +68,17 @@ export const useShipActionMenu: Type = ({selectedRow}) => {
         </Menu>
     );
 
-    const actionColumnView = (
+    return (
         <span>
+            <Modal title="More info" visible={isModalVisible} onOk={closeModal} onCancel={closeModal}>
+                <pre>{JSON.stringify(selectedRow, null, 4)}</pre>
+            </Modal>
+
           <Dropdown overlay={actionMenu} trigger={['click']}>
             <a className="ant-dropdown-link" href="#">
               Actions <DownOutlined/>
             </a>
           </Dropdown>
         </span>
-    );
-
-    return [actionColumnView];
+    )
 }

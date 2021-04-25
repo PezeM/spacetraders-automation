@@ -8,7 +8,7 @@ import Highlighter from 'react-highlight-words';
 import {SearchOutlined} from '@ant-design/icons';
 import {sumShipCargoQuantity} from "../../../helpers/ship";
 import {getUniqueValuesFromArray} from "../../../helpers/arrays";
-import {useShipActionMenu} from "../../table/shipActionMenu";
+import {ShipActionMenu} from "../../table/shipActionMenu";
 import {Key} from "antd/es/table/interface";
 import {Breakpoint} from "antd/es/_util/responsiveObserve";
 
@@ -26,7 +26,6 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
     const [selectedRow, setSelectedRow] = useState<Ship | undefined>(undefined);
     const [searchText, setSearchText] = useState<string>('');
     const [searchedColumn, setSearchedColumn] = useState<string>('');
-    const [actionColumnView] = useShipActionMenu({selectedRow});
 
     const rowSelection = {
         selectedRowKeys,
@@ -192,7 +191,7 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
         {
             title: 'Action',
             key: 'action',
-            render: () => actionColumnView,
+            render: () => <ShipActionMenu selectedRow={selectedRow}/>,
         },
     ]
 

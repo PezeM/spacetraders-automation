@@ -67,8 +67,9 @@ export class ShipController extends BaseController {
 
         try {
             const result = await API.user.sellShip(shipId);
-            console.log('result', result);
+            console.log('result', result); // { sucess: 'Ship scrapped for xxxx credits' }
 
+            this._game.state.userState.removeShip(shipId);
             await new UserService().syncUser(this._game.state.userState);
             res.status(201).json(createApiResponse("Successfully sold ship"));
         } catch (e) {
