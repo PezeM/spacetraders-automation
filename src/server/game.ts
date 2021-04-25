@@ -78,26 +78,6 @@ export class Game implements IGame {
         const {userState} = this.state;
 
         await this._shipShopService.buyRequiredShips();
-
-        // Buy ship
-        // if (CONFIG.has('shipToBuy')) {
-        //     const shipToBuy = CONFIG.get('shipToBuy');
-        //     if (!shipToBuy) return;
-        //     let minMoneyLeft = CONFIG.has('minMoneyLeftAfterBuyingShip') ? CONFIG.get('minMoneyLeftAfterBuyingShip') : 30000;
-        //     if (!minMoneyLeft || isNaN(minMoneyLeft)) return;
-        //
-        //     await shipShopState.isInitialized;
-        //     const ship = shipShopState.data.find(s => s.type === shipToBuy);
-        //     if (ship) {
-        //         const shipPrice = ship.purchaseLocations[0].price;
-        //         if (userState.data.credits - shipPrice > minMoneyLeft) {
-        //             await buyShip(userState, ship.purchaseLocations[0].location, ship.type);
-        //         }
-        //     } else {
-        //         logger.warn(`Couldn't buy ship ${shipToBuy}. Ship is not available in any shop.`)
-        //     }
-        // }
-
         await new UserService().syncUser(userState);
 
         // Pay loans
