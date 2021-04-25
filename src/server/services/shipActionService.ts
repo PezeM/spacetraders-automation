@@ -29,7 +29,7 @@ export class ShipActionService {
             flyInfo = await API.user.createFlightPlan(ship.id, destination);
             ship.flightPlan = flyInfo.flightPlan;
             logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
-            await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
+            await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 5000); // Extra 2s for docking
             logger.info(`Ship ${ship.id} arrived at ${destination}`);
             ship.flightPlan = undefined;
         } catch (e) {
@@ -62,7 +62,7 @@ export class ShipActionService {
         const response = await API.user.buyGood(ship.id, amount, goodType);
         this._state.userState.updateData(response);
         const order = response.order;
-        logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
+        logger.info(`Bought ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$) in ${ship.location} ${ship.id}`);
     }
 
     async sell(ship: UserShip, goodType: GoodType, amount: number) {
@@ -70,6 +70,6 @@ export class ShipActionService {
         const response = await API.user.sellGood(ship.id, amount, goodType);
         this._state.userState.updateData(response);
         const order = response.order;
-        logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$)`);
+        logger.info(`Sold ${order.quantity}x${order.good} for ${order.total}$ (${order.pricePerUnit}$) in ${ship.location} ${ship.id}`);
     }
 }

@@ -44,7 +44,6 @@ export class TradeService {
             if (!goods) {
                 // Refuel
                 await this._shipActionService.refuel(ship);
-
                 await this._shipActionService.fly(ship, trade.source);
                 await this._shipActionService.buy(ship, trade.itemToTrade, remainingCargoSpace(ship));
             }
@@ -56,7 +55,6 @@ export class TradeService {
             const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
             await this._shipActionService.sell(ship, trade.itemToTrade, toSellAmount);
             await this._shipActionService.refuel(ship);
-            // End
 
             logger.info(this._game.state.userState.toString());
         } catch (e) {

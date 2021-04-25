@@ -19,7 +19,6 @@ export const SettingsView = () => {
     const dispatch = useDispatch();
 
     const onFinish = async (values: any) => {
-        console.log('form finish values:', values);
         dispatch(updateSettings(values));
         await message.success("Successfully updated settings.");
     };

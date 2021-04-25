@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {RootState} from '../../store';
 import {AppSettings, SettingsKeys, SettingsValue} from "../../types/settings.interface";
+import {MenuTheme} from "antd";
 
 interface ConfigKey {
     key: SettingsKeys;
@@ -8,9 +9,9 @@ interface ConfigKey {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-    baseUrl: 'http://localhost',
-    port: 8080,
-    theme: "dark"
+    baseUrl: localStorage.getItem('baseUrl') ?? 'http://localhost',
+    port: localStorage.getItem('port') ? parseInt(localStorage.getItem('port') as string) : 8080,
+    theme: localStorage.getItem('theme') as MenuTheme ?? "dark"
 }
 
 const settingsSlice = createSlice({
@@ -19,6 +20,9 @@ const settingsSlice = createSlice({
     reducers: {
         updateSettings(state, action: PayloadAction<AppSettings>) {
             Object.assign(state, action.payload);
+            for (const [key, value] of Object.entries(action.payload)) {
+                localStorage.setItem(key, value.toString());
+            }
         },
         updateKey(state, action: PayloadAction<ConfigKey>) {
             const {key, value} = action.payload;
@@ -27,6 +31,7 @@ const settingsSlice = createSlice({
 
             // @ts-ignore
             state[key] = value;
+            localStorage.setItem(key, value.toString());
         }
     }
 });
