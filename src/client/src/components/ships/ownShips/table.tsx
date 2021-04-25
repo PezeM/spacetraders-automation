@@ -10,6 +10,7 @@ import {sumShipCargoQuantity} from "../../../helpers/ship";
 import {getUniqueValuesFromArray} from "../../../helpers/arrays";
 import {useShipActionMenu} from "../../table/shipActionMenu";
 import {Key} from "antd/es/table/interface";
+import {Breakpoint} from "antd/es/_util/responsiveObserve";
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE_NUMBER = 0;
@@ -122,7 +123,8 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
             title: 'Id',
             dataIndex: 'id',
             sorter: (a: Ship, b: Ship) => a.id.localeCompare(b.id),
-            ...getColumnSearchProps('id')
+            ...getColumnSearchProps('id'),
+            responsive: ['md'] as Breakpoint[]
         },
         {
             title: 'Location',
@@ -134,7 +136,8 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
             title: 'Type',
             dataIndex: 'type',
             sorter: (a: Ship, b: Ship) => a.type.localeCompare(b.type),
-            ...getColumnSearchProps('type')
+            ...getColumnSearchProps('type'),
+
         },
         {
             title: 'Busy',
@@ -146,7 +149,7 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
                     return {value: v, text: v ? 'True' : 'False'}
                 }),
             filterMultiple: true,
-            onFilter: (value: any, ship: Ship) => ship.isBusy === value
+            onFilter: (value: any, ship: Ship) => ship.isBusy === value,
         },
         {
             title: 'Scout ship',
@@ -158,7 +161,8 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
                     return {value: v, text: v ? 'True' : 'False'}
                 }),
             filterMultiple: true,
-            onFilter: (value: any, ship: Ship) => ship.isScoutShip === value
+            onFilter: (value: any, ship: Ship) => ship.isScoutShip === value,
+            responsive: ['lg'] as Breakpoint[]
         },
         {
             title: 'Cargo',
@@ -199,6 +203,7 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
             dataSource={ships}
             columns={columns}
             onChange={handleTableChange}
+            scroll={{x: 500}}
             onRow={record => {
                 return {
                     onClick: () => {

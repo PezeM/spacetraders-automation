@@ -7,7 +7,8 @@ import {
     PartitionOutlined,
     SettingOutlined,
     TeamOutlined,
-    UnorderedListOutlined
+    UnorderedListOutlined,
+    ShopOutlined
 } from '@ant-design/icons';
 import {Key} from "antd/es/table/interface";
 import {useSelector} from "react-redux";
@@ -67,7 +68,7 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                 </Menu.Item>
 
                 <Menu.Item key={ROUTES.ShipShop}>
-                    <SettingOutlined/>
+                    <ShopOutlined/>
                     <span className="nav-text">Shipyard</span>
                 </Menu.Item>
 
