@@ -87,12 +87,9 @@ class MarketplaceService implements IInitializeable {
         visitedLocations.push(location.symbol);
 
         try {
-            console.log(1);
             await shipActionService.refuel(ship, 100);
-            console.log(2);
             await shipActionService.fly(ship, location.symbol);
             await shipActionService.refuel(ship, 100);
-            console.log(3);
 
             // Get marketplace data
             const marketplaceResponse = await API.game.getLocationMarketplace(location.symbol);
