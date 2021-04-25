@@ -46,10 +46,6 @@ export const ShipActionMenu: React.FC<Props> = ({selectedRow}) => {
 
     const actionMenu = (
         <Menu onClick={handleMenuClick}>
-            <Menu.Item key="edit">
-                <EditOutlined/>
-                Some action
-            </Menu.Item>
             <Menu.Item key="show">
                 <InfoOutlined/>
                 Show full info
@@ -70,7 +66,7 @@ export const ShipActionMenu: React.FC<Props> = ({selectedRow}) => {
 
     return (
         <span>
-            <Modal title="More info" visible={isModalVisible} onOk={closeModal} onCancel={closeModal}>
+            <Modal title="More info" visible={isModalVisible} onOk={closeModal} onCancel={closeModal} centered={true}>
                 <pre>{JSON.stringify(selectedRow, null, 4)}</pre>
             </Modal>
 
