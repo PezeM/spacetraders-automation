@@ -697,10 +697,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-spacetraders-api-sdk@^0.6.4:
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/spacetraders-api-sdk/-/spacetraders-api-sdk-0.6.4.tgz#06fa57ce11e8c767b4f4da76af97a21a430a96f7"
-  integrity sha512-Rbm+ZuNbh++2K5iDGR0nWfZVbVIpJzEeFoJKApZ/LAWU5s4RrDoSQc0c2WZsTq3rxB5sHwQ/L7tfaDZ81mBKPg==
+spacetraders-api-sdk@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/spacetraders-api-sdk/-/spacetraders-api-sdk-0.8.0.tgz#085a51e919c98eae0187cef15543f7f6f50e3381"
+  integrity sha512-7MdCOjeeT+mhKhoVCMgQyG6v8qX56oqI+tWy2giIFS9TrteNlEMqMLTIuPwLlwryl+EcedJ7jy0nmUS2jBLBJQ==
   dependencies:
     bottleneck "^2.19.5"
     node-fetch "^2.6.1"

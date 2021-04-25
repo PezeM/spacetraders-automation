@@ -20,6 +20,7 @@ export interface IConfig {
     expressServerPort: number;
     blockedTradeItems: GoodType[];
     shipsToBuy?: Record<string, ShipBuyInfo>;
+    skippedLocations?: string[];
 }
 
 export interface ShipBuyInfo {

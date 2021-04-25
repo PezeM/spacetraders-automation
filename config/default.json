@@ -31,5 +31,19 @@
       "numberOfShips": 30,
       "minMoneyLeftAfterBuying": 150000
     }
-  }
+  },
+  "skippedLocations": [
+    "XV-XA",
+    "XV-ST",
+    "XV-ST-BG",
+    "XV-SN",
+    "XV-OS",
+    "XV-TLF",
+    "XV-CB",
+    "XV-CB-NM",
+    "XV-CB-IT",
+    "XV-BN",
+    "OE-XV-91-2",
+    "XV-OE-2-91"
+  ]
 }

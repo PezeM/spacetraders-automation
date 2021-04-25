@@ -42,7 +42,9 @@ class MarketplaceService implements IInitializeable {
         const scoutShips = await this.getScoutShips(userState, shipShopState, shipsToScrapMarket);
         scoutShips.forEach(s => s.isScoutShip = true);
 
-        const sortedLocations = sortLocationsByDistance(locationState.data);
+        const skipLocation = CONFIG.has("skippedLocations") ? CONFIG.get("skippedLocations") ?? [] : [];
+        const sortedLocations = sortLocationsByDistance(locationState.data)
+            .filter(l => !skipLocation.includes(l.symbol));
         this.logSortedLocations(sortedLocations);
         this.startMarketFetching(sortedLocations, scoutShips, game);
     }
