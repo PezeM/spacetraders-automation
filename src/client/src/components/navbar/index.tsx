@@ -5,13 +5,15 @@ import {
     QuestionCircleOutlined,
     GlobalOutlined,
     BellOutlined,
-    LogoutOutlined, SettingOutlined,
+    LogoutOutlined, SettingOutlined, DollarOutlined,
 } from '@ant-design/icons';
 import {Layout, Menu, Badge} from 'antd';
 import {UserAvatar} from "../userAvatar";
 import {useHistory, useLocation} from "react-router-dom";
 import './style.scss';
 import {ROUTES} from "../../constants/routes";
+import useSWR from "swr";
+import {GameUser} from "../../../../server/types/user.interface";
 
 const {Header} = Layout;
 const {SubMenu} = Menu;
@@ -24,6 +26,7 @@ interface Props {
 export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => {
     const history = useHistory();
     const location = useLocation();
+    const {data} = useSWR<GameUser>('user/');
 
     const getCollapseIcon = () => {
         if (collapsed) {
@@ -55,6 +58,13 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                 }}
             >
                 {window.innerWidth > 992 && getCollapseIcon()}
+            </div>
+
+            <div className="menu money-display">
+                <DollarOutlined/>
+                <span>
+                    ${data?.credits ?? 0}
+                </span>
             </div>
 
             <Menu
@@ -93,16 +103,11 @@ export const LayoutNavbar: React.FC<Props> = ({collapsed, handleOnCollapse}) => 
                           🇺🇸 English
                         </span>
                     </Menu.Item>
-                    <Menu.Item key="it">
-                        <span role="img" aria-label="Italian">
-                          🇮🇹 Italian
-                        </span>
-                    </Menu.Item>
                 </SubMenu>
             </Menu>
 
             <Menu onClick={handleProfileClick} mode="horizontal" className="menu" selectedKeys={[location.pathname]}>
-                <SubMenu title={UserAvatar('PezeM')}>
+                <SubMenu title={UserAvatar(data?.username ?? 'No user')}>
                     <Menu.Item key={ROUTES.Settings}>
                         <span>
                           <SettingOutlined/>

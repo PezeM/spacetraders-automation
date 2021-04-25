@@ -25,3 +25,13 @@
         text-align: center;
     }
 }
+
+.money-display {
+    display: flex;
+    align-items: center;
+    align-content: center;
+
+    span {
+        padding-left: 1vw;
+    }
+}
