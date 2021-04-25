@@ -2,7 +2,7 @@ import {Ship} from "../models/ship";
 import {API} from "../API";
 import logger from "../logger";
 import {wait} from "../utils/general";
-import {GoodType, UserShip} from "spacetraders-api-sdk";
+import {FlightPlanResponse, GoodType, UserShip} from "spacetraders-api-sdk";
 import {shipCargoQuantity} from "../utils/ship";
 import {GameState} from "../state/gameState";
 
@@ -23,11 +23,20 @@ export class ShipActionService {
         if (!ship.location || ship.location === destination) return;
         ship.isTraveling = true;
 
-        // TODO: If not enough fuel try to refuel
-        const flyInfo = await API.user.createFlightPlan(ship.id, destination);
-        logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
-        await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
-        logger.info(`Ship ${ship.id} arrived at ${destination}`);
+        let flyInfo: FlightPlanResponse;
+        try {
+            // TODO: If not enough fuel try to refuel
+            flyInfo = await API.user.createFlightPlan(ship.id, destination);
+            ship.flightPlan = flyInfo.flightPlan;
+            logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
+            await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 2000); // Extra 2s for docking
+            logger.info(`Ship ${ship.id} arrived at ${destination}`);
+            ship.flightPlan = undefined;
+        } catch (e) {
+            await this.refuel(ship, shipCargoQuantity(ship, GoodType.FUEL) + 15);
+            return;
+        }
+
 
         const remainingFuel = flyInfo.flightPlan.fuelRemaining;
         ship.updateData({location: flyInfo.flightPlan.destination});

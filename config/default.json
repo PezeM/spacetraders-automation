@@ -3,7 +3,7 @@
   "token": "",
   "username": "",
   "strategy": "PROFIT",
-  "shipsToScrapMarket": "2",
+  "shipsToScrapMarket": "1",
   "marketplaceRefreshTimer": "3000000",
   "sortProfitBy": "ror",
   "defaultTrade": {
@@ -11,11 +11,39 @@
     "destination": "OE-PM-TR",
     "itemToTrade": "SHIP_PLATING"
   },
-  "shipToBuy": "JW-MK-I",
-  "minMoneyLeftAfterBuyingShip": 100000,
   "sellNotUsedCargo": true,
   "cacheTTL": 300,
   "payLoans": {
     "minMoneyLeftAfterLoanPayment": 200000
-  }
+  },
+  "expressServerPort": 8081,
+  "blockedTradeItems": [],
+  "shipsToBuy": {
+    "JW-MK-I": {
+      "numberOfShips": 5,
+      "minMoneyLeftAfterBuying": 50000
+    },
+    "GR-MK-I": {
+      "numberOfShips": 6,
+      "minMoneyLeftAfterBuying": 80000
+    },
+    "GR-MK-II": {
+      "numberOfShips": 30,
+      "minMoneyLeftAfterBuying": 150000
+    }
+  },
+  "skippedLocations": [
+    "XV-XA",
+    "XV-ST",
+    "XV-ST-BG",
+    "XV-SN",
+    "XV-OS",
+    "XV-TLF",
+    "XV-CB",
+    "XV-CB-NM",
+    "XV-CB-IT",
+    "XV-BN",
+    "OE-XV-91-2",
+    "XV-OE-2-91"
+  ]
 }

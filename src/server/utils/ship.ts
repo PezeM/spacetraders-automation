@@ -7,6 +7,7 @@ import {GameState} from "../state/gameState";
 import {distance} from "./math";
 import {IVector2} from "../types/math.interface";
 import {Ship} from "../models/ship";
+import {getSortedData} from "./array";
 
 /**
  * Returns cheapest ship from ships list
@@ -17,9 +18,8 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
     if (shipType) {
         const ship = ships.find(s => s.type === shipType);
         if (ship) {
-            const cheapestPurchaseLocation = ship.purchaseLocations
-                .sort((a, b) => a.price - b.price)[0];
-            return {ship, purchaseLocation: cheapestPurchaseLocation};
+            const purchaseLocation = getSortedData(ship.purchaseLocations, 'price')[0];
+            return {ship, purchaseLocation: purchaseLocation};
         }
     }
 
@@ -36,11 +36,13 @@ export const getCheapestShip = (ships: ShopShip[], shipType?: string): CheapestS
 export const buyShip = async (userState: UserState, location: string, shipType: string): Promise<Ship> => {
     try {
         const result = await API.user.buyShip(location, shipType);
-        const newShip = result.user.ships[result.user.ships.length - 1];
-        logger.info(`Bought new ship ${shipType} ${newShip.id}`, {shipId: newShip.id});
-        userState.updateData(result.user);
+        logger.info(`Bought new ship ${shipType} ${result.ship.id}`, {
+            shipId: result.ship.id,
+            userCredits: result.credits
+        });
+        userState.updateData(result);
         logger.info(userState.toString());
-        return userState.getShipById(newShip.id);
+        return userState.getShipById(result.ship.id);
     } catch (e) {
         logger.error(`Couldn't buy ship type ${shipType}. Remaining credit ${userState.data.credits}`);
         throw e;
@@ -99,5 +101,5 @@ export const calculateRequiredFuel = (source: Pick<Location, 'x' | 'y' | 'type'>
 export const calculateTravelTime = (shipSpeed: number, source: IVector2, dest: IVector2): number => {
     const dist = distance(source, dest);
 
-    return Math.round(((15 / shipSpeed) * Math.round(dist)) + 59);
+    return Math.round(((2 / shipSpeed) * Math.round(dist)) + 59);
 }

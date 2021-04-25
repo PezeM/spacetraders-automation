@@ -31,6 +31,7 @@ class MarketplaceService implements IInitializeable {
     private async fetchMarketplace(game: IGame) {
         const {locationState, userState, shipShopState} = game.state;
 
+        await locationState.isInitialized;
         let shipsToScrapMarket = CONFIG.get('shipsToScrapMarket');
         if (shipsToScrapMarket === "MAX") shipsToScrapMarket = locationState.data.length;
 
@@ -41,17 +42,21 @@ class MarketplaceService implements IInitializeable {
         const scoutShips = await this.getScoutShips(userState, shipShopState, shipsToScrapMarket);
         scoutShips.forEach(s => s.isScoutShip = true);
 
-        const sortedLocations = sortLocationsByDistance(locationState.data);
+        const skipLocation = CONFIG.has("skippedLocations") ? CONFIG.get("skippedLocations") ?? [] : [];
+        const sortedLocations = sortLocationsByDistance(locationState.data)
+            .filter(l => !skipLocation.includes(l.symbol));
         this.logSortedLocations(sortedLocations);
-        this.testFlight(sortedLocations, scoutShips, game);
+        this.startMarketFetching(sortedLocations, scoutShips, game);
     }
 
-    private async testFlight(locations: LocationWithDistance[], ships: Ship[], game: IGame) {
+    private async startMarketFetching(locations: LocationWithDistance[], ships: Ship[], game: IGame) {
         const visitedLocations: string[] = [];
+        this._loopFinished = false;
         let interval = setInterval(this.marketplaceLoop.bind(this, visitedLocations, locations, ships, game.state), 1000);
 
         await waitFor(() => this._loopFinished, undefined, 1000);
         clearInterval(interval);
+        this._loopFinished = false;
 
         logger.info('Fetched all marketplace data');
         logger.info('Most profitable', {mostProfitable: game.state.marketplaceState.bestProfit});
@@ -68,9 +73,9 @@ class MarketplaceService implements IInitializeable {
         for (const location of locations) {
             if (visitedLocations.includes(location.symbol)) continue;
             const ship = ships.find(s => !s.isTraveling && !s.isBusy);
-            if (!ship) continue;
+            if (!ship || !ship.location) continue;
 
-            await this.visitLocation(ship, location, visitedLocations, shipActionService, marketplaceState);
+            this.visitLocation(ship, location, visitedLocations, shipActionService, marketplaceState);
         }
 
         this._loopFinished = visitedLocations.length === locations.length && ships.every(s => !s.isBusy);
@@ -92,7 +97,7 @@ class MarketplaceService implements IInitializeable {
             logger.debug(`Fetched marketplace location from planet ${location.symbol}`);
             logger.debug('Most profitable', {mostProfitable: marketplaceState.bestProfit});
         } catch (e) {
-            logger.verbose(`Couldn't fetch marketplace in system ${location.symbol}`);
+            logger.verbose(`Couldn't fetch marketplace in system ${location.symbol}`, e);
         }
 
         ship.isTraveling = false;

@@ -15,11 +15,6 @@ async function createNewAccount(): Promise<RegisterUserResponse> {
 }
 
 async function start() {
-    if (!CONFIG.has('token') && CONFIG.has('username')) {
-        logger.error('Specify token in config file');
-        return;
-    }
-
     let username = '';
     let token = '';
 

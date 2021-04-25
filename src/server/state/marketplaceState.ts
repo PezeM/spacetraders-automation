@@ -30,12 +30,16 @@ export class MarketplaceState extends BaseState<NodeCache> {
         return this._bestProfit;
     }
 
+    get worstProfit() {
+        return this._worstProfit;
+    }
+
     async initializeState(): Promise<void> {
         this._isInitialized = new Promise(r => r(false));
     }
 
     getMarketplaceData(symbol: string) {
-        return this._data.get<PlanetMarketplace>(symbol);
+        return symbol ? this._data.get<PlanetMarketplace>(symbol) : undefined;
     }
 
     async getOrCreatePlanetMarketplace(location: string): Promise<PlanetMarketplace> {
@@ -66,6 +70,12 @@ export class MarketplaceState extends BaseState<NodeCache> {
             }
         }
 
+        const blockedTrades = CONFIG.get('blockedTradeItems');
+        if (blockedTrades && blockedTrades.length > 0) {
+            // Remove blocked trades from source
+            source = source.filter(t => !blockedTrades.includes(t.symbol));
+        }
+
         return source.sort((a, b) =>
             (b[sortedBy] ?? b["profitPerItem"]) - (a[sortedBy] ?? a["profitPerItem"]));
     }
@@ -83,7 +93,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
             const bestSell = this._bestSellers.get(key);
             if (!bestSell || bestSell.pricePerUnit === value.pricePerUnit) return;
 
-            const gainPerItem = bestSell.pricePerUnit - value.pricePerUnit;
+            const gainPerItem = (bestSell.pricePerUnit - value.pricePerUnit) ?? 0;
             const dist = Math.round(distance(value.location, bestSell.location));
             const distFactor = dist * PROFIT_DIST_MULT;
 
@@ -97,9 +107,9 @@ export class MarketplaceState extends BaseState<NodeCache> {
                 symbol: key,
                 buy: value,
                 sell: bestSell,
-                profitPerItem: profit.gainPerItem / distFactor,
-                profitPerVolume: profit.gainPerVolume / distFactor,
-                profitPerItemPercentage: profit.gainPerItemPercentage / distFactor,
+                profitPerItem: (profit.gainPerItem / distFactor) ?? 0,
+                profitPerVolume: (profit.gainPerVolume / distFactor) ?? 0,
+                profitPerItemPercentage: (profit.gainPerItemPercentage / distFactor) ?? 0,
                 distance: dist,
                 ...profit
             });
@@ -118,7 +128,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
             const bestBuy = this._bestBuyers.get(key);
             if (!bestBuy || bestBuy.pricePerUnit === value.pricePerUnit) return;
 
-            const gainPerItem = value.pricePerUnit - bestBuy.pricePerUnit;
+            const gainPerItem = (value.pricePerUnit - bestBuy.pricePerUnit) ?? 0;
             const dist = Math.round(distance(value.location, bestBuy.location));
             const distFactor = dist * PROFIT_DIST_MULT;
 
@@ -146,18 +156,20 @@ export class MarketplaceState extends BaseState<NodeCache> {
     }
 
     private computeBestSellers() {
-        const bestSellers = this.marketplaceSellersComputation((a, b) => a.pricePerUnit > b.pricePerUnit);
+        const bestSellers = this.marketplaceSellersComputation(
+            (a, b) => a.pricePerUnit > b.pricePerUnit, false);
         this._bestSellers = bestSellers;
         return bestSellers;
     }
 
     private computeBestBuyers() {
-        const bestBuyer = this.marketplaceSellersComputation((a, b) => a.pricePerUnit < b.pricePerUnit);
+        const bestBuyer = this.marketplaceSellersComputation(
+            (a, b) => a.pricePerUnit < b.pricePerUnit);
         this._bestBuyers = bestBuyer;
         return bestBuyer;
     }
 
-    private marketplaceSellersComputation(priceCheck: (a: MarketplaceSeller, b: Marketplace) => boolean) {
+    private marketplaceSellersComputation(priceCheck: (a: MarketplaceSeller, b: Marketplace) => boolean, buying = true) {
         const sellersMap = new Map<GoodType, MarketplaceSeller>();
 
         for (const key of this._data.keys()) {
@@ -171,7 +183,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
                 if (addedProduct && priceCheck(addedProduct, product)) continue;
 
                 sellersMap.set(product.symbol, {
-                    pricePerUnit: product.pricePerUnit,
+                    pricePerUnit: buying ? product.purchasePricePerUnit : product.sellPricePerUnit,
                     volumePerUnit: product.volumePerUnit,
                     available: product.quantityAvailable,
                     location: {

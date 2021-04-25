@@ -64,6 +64,15 @@ export class UserState extends BaseState<GameUser> {
             const ship = this.data.ships.find(s => s.id === data.ship?.id);
             if (ship) {
                 ship.updateData(data.ship);
+            } else {
+                this._data.ships.push(Ship.createShip(data.ship));
+            }
+        }
+
+        if (data.loan) {
+            const index = this.data.loans.findIndex(s => s.id === data.loan?.id);
+            if (index !== -1) {
+                this.data.loans[index] = {...data.loan};
             }
         }
     }
@@ -82,6 +91,10 @@ export class UserState extends BaseState<GameUser> {
 
     getShips(scoutShip = false) {
         return this.data.ships.filter(s => s.isScoutShip === scoutShip);
+    }
+
+    getShipsOfType(type: string): Ship[] {
+        return this._data.ships.filter(s => s.type === type);
     }
 
     toString() {

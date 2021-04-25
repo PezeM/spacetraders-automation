@@ -11,13 +11,21 @@ export interface IConfig {
     marketplaceRefreshTimer: number;
     sortProfitBy: MarketplaceProfitType;
     defaultTrade?: ITradeData;
-    shipToBuy?: string;
     minMoneyLeftAfterBuyingShip: number;
     sellNotUsedCargo: boolean;
     cacheTTL: number;
     payLoans?: {
         minMoneyLeftAfterLoanPayment: number;
-    }
+    },
+    expressServerPort: number;
+    blockedTradeItems: GoodType[];
+    shipsToBuy?: Record<string, ShipBuyInfo>;
+    skippedLocations?: string[];
+}
+
+export interface ShipBuyInfo {
+    numberOfShips: number;
+    minMoneyLeftAfterBuying: number;
 }
 
 export interface ITradeData {
