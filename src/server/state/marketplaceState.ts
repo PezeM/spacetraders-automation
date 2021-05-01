@@ -120,7 +120,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
 
         this._bestProfit = bestProfit.sort((a, b) => b.profitPerVolume - a.profitPerVolume);
         this._isInitialized = new Promise(r => r(true));
-        logger.debug(`Most profitable trades`, {bestProfit: this._bestProfit});
+        logger.debug(`Most profitable trades`, {bestProfit: this._bestProfit.slice(0, 3)});
         return this._bestProfit;
     }
 

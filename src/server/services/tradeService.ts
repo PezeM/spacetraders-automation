@@ -30,8 +30,6 @@ export class TradeService {
     async trade(ship: Ship, trade: ITradeData) {
         ship.isBusy = true;
 
-        console.log(trade);
-
         try {
             if (CONFIG.get('sellNotUsedCargo')) {
                 const extraCargo = filterShipCargos(ship, [trade.itemToTrade, GoodType.FUEL]);
