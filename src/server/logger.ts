@@ -27,14 +27,14 @@ const logger = winston.createLogger({
     ),
     transports: [
         new DailyRotateFile({
-            level: 'debug',
+            level: CONFIG.get("logLevel") ?? "debug",
             handleExceptions: true,
             maxSize: "20m",
             maxFiles: "7d",
             filename: `${CONFIG.get('logsDir')}/log-%DATE%.log`,
         }),
         new DailyRotateFile({
-            level: 'warn',
+            level: CONFIG.get("logLevel") ?? "debug",
             handleExceptions: true,
             maxSize: "20m",
             maxFiles: "7d",

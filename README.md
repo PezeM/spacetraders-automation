@@ -73,6 +73,10 @@ Spacetraders API username. Will create new account if token and username are not
 
 Name of the directory where logs will be saved. It will be created if it doesn't exist.
 
+#### `logLevel: string`
+
+Level of saved and displayed logs.
+
 #### `strategy: TradeStrategy`
 
 What strategy is used for trading, either `PROFIT` or `LOSS`. When `LOSS` is selected, app will make the worst trades possible.
