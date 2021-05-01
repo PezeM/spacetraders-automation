@@ -4,6 +4,7 @@ import {Game} from "./game";
 import {RegisterUserResponse} from "spacetraders-api-sdk";
 import {API} from "./API";
 import logger from "./logger";
+import './influxDB';
 
 async function createNewAccount(): Promise<RegisterUserResponse> {
     try {

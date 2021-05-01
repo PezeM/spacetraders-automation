@@ -46,5 +46,11 @@
     "XV-BN",
     "OE-XV-91-2",
     "XV-OE-2-91"
-  ]
+  ],
+  "fluxConfig": {
+    "url": "url",
+    "token": "token",
+    "org": "org",
+    "bucket": "spacetraders"
+  }
 }

@@ -22,6 +22,7 @@ export interface IConfig {
     blockedTradeItems: GoodType[];
     shipsToBuy?: Record<string, ShipBuyInfo>;
     skippedLocations?: string[];
+    fluxConfig: FluxDBConfig;
 }
 
 export interface ShipBuyInfo {
@@ -33,4 +34,11 @@ export interface ITradeData {
     source: string;
     destination: string;
     itemToTrade: GoodType;
+}
+
+export interface FluxDBConfig {
+    url: string;
+    token: string;
+    org: string;
+    bucket: string;
 }

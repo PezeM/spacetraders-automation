@@ -11,6 +11,7 @@ import {LoanService} from "./services/loanService";
 import {createExpressServer} from "./expressServer";
 import {UserService} from "./services/userService";
 import {ShipShopService} from "./services/shipShopService";
+import {DatabaseService} from "./services/databaseService";
 
 export class Game implements IGame {
     public readonly state: GameState;
@@ -18,12 +19,14 @@ export class Game implements IGame {
     private _gameLoopInterval: NodeJS.Timeout;
     private _utilityInterval: NodeJS.Timeout;
     private _shipShopService: ShipShopService;
+    private _databaseService: DatabaseService;
 
     constructor(private _token: string, private _username: string) {
         logger.info('Initialized game instance');
         this.state = new GameState(this);
         this._tradeService = new TradeService(this);
         this._shipShopService = new ShipShopService(this.state);
+        this._databaseService = new DatabaseService();
 
         API.game.isOnline()
             .then(async (isServerOnline) => {
@@ -85,5 +88,7 @@ export class Game implements IGame {
             const loanService = new LoanService();
             await loanService.payLoans(userState);
         }
+
+        await this._databaseService.saveShipsCount(userState);
     }
 }

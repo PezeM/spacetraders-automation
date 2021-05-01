@@ -103,3 +103,12 @@ export const calculateTravelTime = (shipSpeed: number, source: IVector2, dest: I
 
     return Math.round(((2 / shipSpeed) * Math.round(dist)) + 59);
 }
+
+export const getRequiredFuelFromErrorMsg = (msg: string): number => {
+    const splitted = msg.split(' ');
+    const required = splitted.lastIndexOf('require');
+    if (!required) return 0;
+    const fuelIndex = required + 1;
+    if (splitted.length < fuelIndex) return 0;
+    return parseInt(splitted[fuelIndex]);
+}

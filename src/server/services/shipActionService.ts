@@ -3,7 +3,7 @@ import {API} from "../API";
 import logger from "../logger";
 import {wait} from "../utils/general";
 import {FlightPlanResponse, GoodType, UserShip} from "spacetraders-api-sdk";
-import {shipCargoQuantity} from "../utils/ship";
+import {getRequiredFuelFromErrorMsg, shipCargoQuantity} from "../utils/ship";
 import {GameState} from "../state/gameState";
 
 export class ShipActionService {
@@ -29,12 +29,20 @@ export class ShipActionService {
             flyInfo = await API.user.createFlightPlan(ship.id, destination);
             ship.flightPlan = flyInfo.flightPlan;
             logger.info(`Ship ${ship.id} flying to ${destination}. Time ${flyInfo.flightPlan.timeRemainingInSeconds}s`);
-            await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 5000); // Extra 2s for docking
+            await wait(flyInfo.flightPlan.timeRemainingInSeconds * 1000 + 5000); // Extra 5s for docking
             logger.info(`Ship ${ship.id} arrived at ${destination}`);
             ship.flightPlan = undefined;
         } catch (e) {
+            // Message with required fuel for flight
+            if (e.error && e.error.message) {
+                const fuel = getRequiredFuelFromErrorMsg(e.error.message);
+                if (fuel) {
+                    await this.refuel(ship, shipCargoQuantity(ship, GoodType.FUEL) + fuel);
+                    return await this.fly(ship, destination);
+                }
+            }
+
             console.error(`Fly with #${ship.id} failed because`, e);
-            await this.refuel(ship, shipCargoQuantity(ship, GoodType.FUEL) + 15);
             return false;
         }
 

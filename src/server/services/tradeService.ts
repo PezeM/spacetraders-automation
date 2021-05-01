@@ -8,12 +8,15 @@ import {CONFIG} from "../config";
 import {getBestTrade} from "../utils/trade";
 import {ShipActionService} from "./shipActionService";
 import {Cargo, GoodType, UserShip} from "spacetraders-api-sdk";
+import {DatabaseService} from "./databaseService";
 
 export class TradeService {
     private readonly _shipActionService: ShipActionService;
+    private readonly _databaseService: DatabaseService;
 
     constructor(private _game: IGame) {
         this._shipActionService = new ShipActionService(this._game.state);
+        this._databaseService = new DatabaseService();
     }
 
     async tradeLoop(ships: Ship[]) {
@@ -56,7 +59,7 @@ export class TradeService {
             // Fly to sell location
             // Sell
             // Refuel
-            const flyResult = await this._shipActionService.fly(ship, trade.destination);
+            await this._shipActionService.fly(ship, trade.destination);
             await wait(1000);
             const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
             if (ship.location !== trade.destination) {
@@ -67,6 +70,7 @@ export class TradeService {
             await this._shipActionService.refuel(ship);
 
             logger.info(this._game.state.userState.toString());
+            await this._databaseService.saveUserMoney(this._game.state.userState);
         } catch (e) {
             logger.error(`Error while trading with ship ${ship.id}`, e);
             ship.isTraveling = false;
