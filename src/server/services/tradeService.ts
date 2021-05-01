@@ -30,6 +30,8 @@ export class TradeService {
     async trade(ship: Ship, trade: ITradeData) {
         ship.isBusy = true;
 
+        console.log(trade);
+
         try {
             if (CONFIG.get('sellNotUsedCargo')) {
                 const extraCargo = filterShipCargos(ship, [trade.itemToTrade, GoodType.FUEL]);
@@ -53,6 +55,10 @@ export class TradeService {
             // Refuel
             await this._shipActionService.fly(ship, trade.destination);
             const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
+            if (ship.location !== trade.destination) {
+                logger.warn(`Ship #${ship.id} was on wrong planet while trading ${ship.location} to ${trade.destination}`);
+                await this._shipActionService.fly(ship, trade.destination);
+            }
             await this._shipActionService.sell(ship, trade.itemToTrade, toSellAmount);
             await this._shipActionService.refuel(ship);
 

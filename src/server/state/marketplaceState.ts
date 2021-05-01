@@ -82,7 +82,10 @@ export class MarketplaceState extends BaseState<NodeCache> {
 
     getBestTradeBy(sortedBy: MarketplaceProfitType, strategy: TradeStrategy = TradeStrategy.Profit, ship?: UserShip) {
         const bestTrade = this.getTradesBy(sortedBy, strategy, ship)[0];
-        if (!bestTrade || !bestTrade[sortedBy]) return undefined;
+        if (!bestTrade) return undefined;
+        const property = bestTrade[sortedBy];
+        // Check if the trade if even worth it
+        if (!property || property <= 0) return undefined;
         return bestTrade;
     }
 
@@ -142,9 +145,9 @@ export class MarketplaceState extends BaseState<NodeCache> {
                 symbol: key,
                 buy: bestBuy,
                 sell: value,
-                profitPerItem: profit.gainPerItem / distFactor,
-                profitPerVolume: profit.gainPerVolume / distFactor,
-                profitPerItemPercentage: profit.gainPerItemPercentage / distFactor,
+                profitPerItem: distFactor <= 0 ? 0 : profit.gainPerItem / distFactor,
+                profitPerVolume: distFactor <= 0 ? 0 : profit.gainPerVolume / distFactor,
+                profitPerItemPercentage: distFactor <= 0 ? 0 : profit.gainPerItemPercentage / distFactor,
                 distance: dist,
                 ...profit
             });
