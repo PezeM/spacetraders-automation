@@ -6,6 +6,7 @@ export interface IConfig {
     username: string;
     token: string;
     logsDir: string;
+    logLevel: string;
     strategy: TradeStrategy;
     shipsToScrapMarket: number | "MAX";
     marketplaceRefreshTimer: number;

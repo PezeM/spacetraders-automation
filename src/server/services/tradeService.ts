@@ -22,6 +22,11 @@ export class TradeService {
             const trade = getBestTrade(this._game.state.marketplaceState, ship, CONFIG.get('strategy'));
             if (!trade) continue;
 
+            if (trade.destination == trade.source) {
+                logger.error(`Destination and source for trade is the same`, {trade});
+                return;
+            }
+
             this.trade(ship, trade);
             await wait(1000);
         }
@@ -51,7 +56,8 @@ export class TradeService {
             // Fly to sell location
             // Sell
             // Refuel
-            await this._shipActionService.fly(ship, trade.destination);
+            const flyResult = await this._shipActionService.fly(ship, trade.destination);
+            await wait(1000);
             const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
             if (ship.location !== trade.destination) {
                 logger.warn(`Ship #${ship.id} was on wrong planet while trading ${ship.location} to ${trade.destination}`);

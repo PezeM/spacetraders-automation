@@ -19,8 +19,8 @@ export class ShipActionService {
         await this.buy(ship, GoodType.FUEL, neededFuel);
     }
 
-    async fly(ship: Ship, destination: string) {
-        if (!ship.location || ship.location === destination) return;
+    async fly(ship: Ship, destination: string): Promise<boolean> {
+        if (!ship.location || ship.location === destination) return false;
         ship.isTraveling = true;
 
         let flyInfo: FlightPlanResponse;
@@ -33,8 +33,9 @@ export class ShipActionService {
             logger.info(`Ship ${ship.id} arrived at ${destination}`);
             ship.flightPlan = undefined;
         } catch (e) {
+            console.error(`Fly with #${ship.id} failed because`, e);
             await this.refuel(ship, shipCargoQuantity(ship, GoodType.FUEL) + 15);
-            return;
+            return false;
         }
 
 
@@ -42,6 +43,7 @@ export class ShipActionService {
         ship.updateData({location: flyInfo.flightPlan.destination});
         ship.updateCargo(GoodType.FUEL, {totalVolume: remainingFuel, quantity: remainingFuel});
         ship.isTraveling = false;
+        return true;
     }
 
     async buy(ship: Ship, goodType: GoodType, amount: number) {

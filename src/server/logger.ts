@@ -15,7 +15,7 @@ const formatter = format.printf((info) => {
 });
 
 const logger = winston.createLogger({
-    level: 'debug',
+    level: CONFIG.get("logLevel") ?? "debug",
     handleExceptions: true,
     format: format.combine(
         format.splat(),

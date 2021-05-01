@@ -1,5 +1,6 @@
 {
   "logsDir": "logs",
+  "logLevel": "info",
   "token": "",
   "username": "",
   "strategy": "PROFIT",
@@ -24,11 +25,11 @@
       "minMoneyLeftAfterBuying": 50000
     },
     "GR-MK-I": {
-      "numberOfShips": 6,
+      "numberOfShips": 0,
       "minMoneyLeftAfterBuying": 80000
     },
     "GR-MK-II": {
-      "numberOfShips": 30,
+      "numberOfShips": 0,
       "minMoneyLeftAfterBuying": 150000
     }
   },
