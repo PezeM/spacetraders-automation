@@ -46,7 +46,7 @@ export class ShipController extends BaseController {
 
 
         res.status(200)
-            .send(getBestTrade(this._game.state.marketplaceState, ship));
+            .send(getBestTrade(this._game.state.marketplaceState, this._game.state.locationState, ship));
     }
 
     getCheapestShip(req: Request, res: Response) {

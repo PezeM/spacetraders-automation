@@ -10,6 +10,7 @@ import {ShipActionService} from "./shipActionService";
 import {Cargo, GoodType, UserShip} from "spacetraders-api-sdk";
 import {DatabaseService} from "./databaseService";
 import {ShipShopService} from "./shipShopService";
+import {GoodsTradeInterface} from "../types/trade.interface";
 
 export class TradeService {
     private readonly _shipActionService: ShipActionService;
@@ -23,9 +24,11 @@ export class TradeService {
     }
 
     async tradeLoop(ships: Ship[]) {
+        const {marketplaceState, locationState} = this._game.state;
+
         for (const ship of ships) {
             if (ship.isBusy || !ship.location) continue;
-            const trade = getBestTrade(this._game.state.marketplaceState, ship, CONFIG.get('strategy'));
+            const trade = getBestTrade(marketplaceState, locationState, ship, CONFIG.get('strategy'));
             if (!trade) continue;
 
             if (trade.destination == trade.source) {
@@ -38,7 +41,7 @@ export class TradeService {
         }
     }
 
-    async trade(ship: Ship, trade: ITradeData) {
+    async trade(ship: Ship, trade: GoodsTradeInterface) {
         ship.isBusy = true;
 
         try {
@@ -54,24 +57,30 @@ export class TradeService {
             const goods = shipCargoQuantity(ship, trade.itemToTrade);
             if (!goods) {
                 // Refuel
-                await this._shipActionService.refuel(ship);
-                await this._shipActionService.fly(ship, trade.source);
-                await this._shipActionService.buy(ship, trade.itemToTrade, remainingCargoSpace(ship));
+                await this._shipActionService.refuel(ship,
+                    calculateRequiredFuel(ship, this._game.state.locationState.getLocationData(ship.location), trade.source));
+                await this._shipActionService.fly(ship, trade.source.symbol);
+                await this._shipActionService.buy(ship, trade.itemToTrade,
+                    remainingCargoSpace(ship) - calculateRequiredFuel(ship, this._game.state.locationState.getLocationData(ship.location), trade.destination) - 10);
                 await this._shipShopService.buyRequiredShips();
             }
 
+            // Refuel
             // Fly to sell location
             // Sell
-            // Refuel
-            await this._shipActionService.fly(ship, trade.destination);
+            await this._shipActionService.refuel(ship,
+                calculateRequiredFuel(ship, this._game.state.locationState.getLocationData(ship.location), trade.destination));
+            await this._shipActionService.fly(ship, trade.destination.symbol);
             await wait(1000);
-            const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
-            if (ship.location !== trade.destination) {
-                logger.warn(`Ship #${ship.id} was on wrong planet while trading ${ship.location} to ${trade.destination}`);
-                await this._shipActionService.fly(ship, trade.destination);
+            if (ship.location !== trade.destination.symbol) {
+                logger.warn(`Ship #${ship.id} was on wrong planet while trading ${ship.location} to ${trade.destination.symbol}`);
+                ship.isBusy = false;
+                return;
             }
+
+            const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
             await this._shipActionService.sell(ship, trade.itemToTrade, toSellAmount);
-            await this._shipActionService.refuel(ship);
+            await this._shipActionService.refuel(ship, 25);
             await this._shipShopService.buyRequiredShips();
 
             logger.info(this._game.state.userState.toString());

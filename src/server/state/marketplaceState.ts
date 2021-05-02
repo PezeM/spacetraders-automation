@@ -204,7 +204,7 @@ export class MarketplaceState extends BaseState<NodeCache> {
     }
 
     private calculateRateOfReturn(ship: UserShip, buy: MarketplaceSeller, sell: MarketplaceSeller) {
-        const fuelNeeded = calculateRequiredFuel(buy.location, sell.location);
+        const fuelNeeded = calculateRequiredFuel(ship, buy.location, sell.location);
         const shipPrice = this._game.state.shipShopState.getPriceOfShip(ship.type) ?? 100000;
         const flightTimeInHours = calculateTravelTime(ship.speed, buy.location, sell.location) / 3600;
 

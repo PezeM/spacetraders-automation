@@ -82,14 +82,39 @@ export const filterShipCargos = (ship: UserShip, goods: GoodType[]) => {
 
 /**
  * Returns required fuel to travel from source to destination
+ * @param ship
  * @param source Starting location
  * @param dest Destination location
  */
-export const calculateRequiredFuel = (source: Pick<Location, 'x' | 'y' | 'type'>, dest: Pick<Location, 'x' | 'y' | 'type'>): number => {
-    const penalty = source.type === AsteroidType.PLANET ? 2 : 0; // Penalty is 2 when departing from planet
-    const dist = distance(source, dest);
+export const calculateRequiredFuel = (ship: UserShip, source: Pick<Location, 'x' | 'y' | 'type'>, dest: Pick<Location, 'x' | 'y' | 'type'>): number => {
+    // const penalty = source.type === AsteroidType.PLANET ? 2 : 0; // Penalty is 2 when departing from planet
+    // const dist = distance(source, dest);
+    //
+    // return Math.round((Math.round(dist) / 4)) + penalty + 1;
 
-    return Math.round((Math.round(dist) / 4)) + penalty + 1;
+    const isPlanet = source.type == "PLANET";
+    let penalty = 0;
+    let multiplier = 0.25;
+
+    switch (ship.type) {
+        case "HM-MK-III":
+            multiplier = 0.188;
+            penalty = isPlanet ? 1 : 0;
+            break;
+        case "GR-MK-III":
+            penalty = isPlanet ? 4 : 0;
+            break;
+        case "GR-MK-II":
+            penalty = isPlanet ? 3 : 0;
+            break;
+        default:
+            penalty = isPlanet ? 2 : 0;
+            break;
+    }
+
+    let dist = Math.sqrt((source.x - dest.x) ** 2 + (source.y - dest.y) ** 2);
+    return Math.round(Math.round(dist) * multiplier) + penalty + 1;
+
 }
 
 /**

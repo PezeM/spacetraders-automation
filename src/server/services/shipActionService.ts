@@ -14,7 +14,6 @@ export class ShipActionService {
     async refuel(ship: Ship, wantedFuel: number = 25): Promise<boolean> {
         const fuelInCargo = shipCargoQuantity(ship, GoodType.FUEL);
         const neededFuel = wantedFuel - fuelInCargo;
-        console.log('neededFuel', neededFuel, fuelInCargo);
         if (neededFuel <= 0) return true;
 
         return await this.buy(ship, GoodType.FUEL, neededFuel);
@@ -66,10 +65,8 @@ export class ShipActionService {
 
         const creditsCanAfford = Math.floor(this._state.userState.data.credits / item.pricePerUnit);
         const spaceCanAfford = Math.floor(ship.spaceAvailable / item.volumePerUnit);
-        console.log('spaceCanAfford', spaceCanAfford, creditsCanAfford);
         const toBuy = Math.floor(Math.min(creditsCanAfford, spaceCanAfford, item.quantityAvailable, amount));
 
-        console.log('toBuy', toBuy);
         if (isNaN(toBuy) || toBuy <= 0) return false;
         return await this.buyGood(ship, goodType, toBuy);
     }
