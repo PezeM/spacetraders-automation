@@ -1,5 +1,5 @@
 import {IGame} from "../types/game.interface";
-import {filterShipCargos, remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
+import {calculateRequiredFuel, filterShipCargos, remainingCargoSpace, shipCargoQuantity} from "../utils/ship";
 import {Ship} from "../models/ship";
 import logger from "../logger";
 import {ITradeData} from "../types/config.interface";
@@ -9,14 +9,17 @@ import {getBestTrade} from "../utils/trade";
 import {ShipActionService} from "./shipActionService";
 import {Cargo, GoodType, UserShip} from "spacetraders-api-sdk";
 import {DatabaseService} from "./databaseService";
+import {ShipShopService} from "./shipShopService";
 
 export class TradeService {
     private readonly _shipActionService: ShipActionService;
     private readonly _databaseService: DatabaseService;
+    private readonly _shipShopService: ShipShopService;
 
     constructor(private _game: IGame) {
         this._shipActionService = new ShipActionService(this._game.state);
         this._databaseService = new DatabaseService();
+        this._shipShopService = new ShipShopService(this._game.state);
     }
 
     async tradeLoop(ships: Ship[]) {
@@ -54,6 +57,7 @@ export class TradeService {
                 await this._shipActionService.refuel(ship);
                 await this._shipActionService.fly(ship, trade.source);
                 await this._shipActionService.buy(ship, trade.itemToTrade, remainingCargoSpace(ship));
+                await this._shipShopService.buyRequiredShips();
             }
 
             // Fly to sell location
@@ -68,6 +72,7 @@ export class TradeService {
             }
             await this._shipActionService.sell(ship, trade.itemToTrade, toSellAmount);
             await this._shipActionService.refuel(ship);
+            await this._shipShopService.buyRequiredShips();
 
             logger.info(this._game.state.userState.toString());
             await this._databaseService.saveUserMoney(this._game.state.userState);

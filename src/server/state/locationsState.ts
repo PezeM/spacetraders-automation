@@ -31,4 +31,13 @@ export class LocationsState extends BaseState<Location[]> {
             this._data = this._data.concat(locations.locations);
         }
     }
+
+    public getLocationData(symbol: string): Location {
+        const location = this._data.find(l => l.symbol === symbol);
+        if (!location) {
+            throw new Error(`Location with symbol ${symbol} not found`);
+        }
+
+        return location;
+    }
 }
