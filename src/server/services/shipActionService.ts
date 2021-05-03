@@ -38,7 +38,6 @@ export class ShipActionService {
             // Message with required fuel for flight
             if (error && error.message) {
                 const fuel = getRequiredFuelFromErrorMsg(error.message);
-                console.log('fuel', fuel);
                 if (fuel) {
                     const boughtFuel = await this.refuel(ship, shipCargoQuantity(ship, GoodType.FUEL) + fuel);
                     if (!boughtFuel) return false;

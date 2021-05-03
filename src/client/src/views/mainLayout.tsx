@@ -8,6 +8,7 @@ import {SettingsView} from "./settings";
 import {ROUTES} from "../constants/routes";
 import {OwnShips} from "./ownShips";
 import {ShipsShop} from "./shipsShop";
+import {LocationsView} from "./locationsView";
 
 const {Content} = Layout;
 
@@ -37,6 +38,7 @@ export const MainLayout = () => {
                             <Route path={ROUTES.Settings} component={SettingsView}/>
                             <Route path={ROUTES.OwnShips} component={OwnShips}/>
                             <Route path={ROUTES.ShipShop} component={ShipsShop}/>
+                            <Route path={ROUTES.Locations} component={LocationsView}/>
                         </Switch>
                     </div>
                 </Content>

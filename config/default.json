@@ -50,7 +50,7 @@
   "fluxConfig": {
     "url": "url",
     "token": "token",
-    "org": "org",
+    "org": "org@gmail.com",
     "bucket": "spacetraders"
   }
 }

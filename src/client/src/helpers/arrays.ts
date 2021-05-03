@@ -24,3 +24,12 @@ export const groupBy = <T, K extends keyof T>(array: T[], key: K) => {
 export const getSortedData = <T, K extends keyof T>(array: T[], prop: K, ascending = true): T[] => {
     return array.sort((a, b) => (a[prop] < b[prop] ? -1 : 1) * (ascending ? 1 : -1));
 }
+
+export const mapArrayToValueText = <T>(data: T[]): { value: any, text: any }[] => {
+    return data.map(v => {
+        return {
+            value: v,
+            text: v
+        }
+    });
+}

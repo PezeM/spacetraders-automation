@@ -4,5 +4,6 @@ export const ROUTES = {
     Dashboard: '/',
     Settings: '/settings',
     OwnShips: '/own-ships',
-    ShipShop: '/ship-shop'
+    ShipShop: '/ship-shop',
+    Locations: '/locations',
 }

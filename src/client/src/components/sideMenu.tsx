@@ -72,6 +72,11 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                     <span className="nav-text">Shipyard</span>
                 </Menu.Item>
 
+                <Menu.Item key={ROUTES.Locations}>
+                    <ShopOutlined/>
+                    <span className="nav-text">Locations</span>
+                </Menu.Item>
+
                 <SubMenu
                     key="products"
                     title={

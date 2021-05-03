@@ -1,16 +1,16 @@
 import React, {useState} from 'react';
 import {Button, Input, Space, Table, Tag} from "antd";
 import {Ship} from "../../../../../server/models/ship";
-import {getColorOfGood} from "../../../helpers/goods";
 import {Cargo} from "spacetraders-api-sdk";
 import {BooleanIconColumn} from "../../table/booleanIconColumn";
 import Highlighter from 'react-highlight-words';
 import {SearchOutlined} from '@ant-design/icons';
 import {sumShipCargoQuantity} from "../../../helpers/ship";
-import {getUniqueValuesFromArray} from "../../../helpers/arrays";
+import {getUniqueValuesFromArray, mapArrayToValueText} from "../../../helpers/arrays";
 import {ShipActionMenu} from "../../table/shipActionMenu";
 import {Key} from "antd/es/table/interface";
 import {Breakpoint} from "antd/es/_util/responsiveObserve";
+import {getColorOfItem} from "../../../helpers/color";
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE_NUMBER = 0;
@@ -170,17 +170,14 @@ export const OwnShipTable: React.FC<Props> = ({ships}) => {
                 <>
                     {cargo.map((item: Cargo) => {
                         return (
-                            <Tag color={getColorOfGood(item.good)} key={item.good}>
+                            <Tag color={getColorOfItem(item.good, 5)} key={item.good}>
                                 {item.good} x{item.quantity}
                             </Tag>
                         );
                     })}
                 </>
             ),
-            filters: getUniqueValuesFromArray(getUniqueValuesFromArray(ships, 'cargo'), 'good')
-                .map(v => {
-                    return {value: v, text: v}
-                }),
+            filters: mapArrayToValueText(getUniqueValuesFromArray(getUniqueValuesFromArray(ships, 'cargo'), 'good')),
             filterMultiple: true,
             onFilter: (value: any, ship: Ship) => ship.cargo?.some(c => c.good === value),
             sorter: (a: Ship, b: Ship) => {

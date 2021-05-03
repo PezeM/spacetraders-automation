@@ -61,7 +61,7 @@ export class TradeService {
                     calculateRequiredFuel(ship, this._game.state.locationState.getLocationData(ship.location), trade.source));
                 await this._shipActionService.fly(ship, trade.source.symbol);
                 await this._shipActionService.buy(ship, trade.itemToTrade,
-                    remainingCargoSpace(ship) - calculateRequiredFuel(ship, this._game.state.locationState.getLocationData(ship.location), trade.destination) - 10);
+                    remainingCargoSpace(ship) - calculateRequiredFuel(ship, this._game.state.locationState.getLocationData(ship.location), trade.destination));
                 await this._shipShopService.buyRequiredShips();
             }
 
@@ -80,7 +80,7 @@ export class TradeService {
 
             const toSellAmount = shipCargoQuantity(ship, trade.itemToTrade);
             await this._shipActionService.sell(ship, trade.itemToTrade, toSellAmount);
-            await this._shipActionService.refuel(ship, 25);
+            await this._shipActionService.refuel(ship, 10);
             await this._shipShopService.buyRequiredShips();
 
             logger.info(this._game.state.userState.toString());

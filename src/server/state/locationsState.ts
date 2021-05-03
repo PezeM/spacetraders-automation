@@ -24,12 +24,16 @@ export class LocationsState extends BaseState<Location[]> {
     }
 
     public async fetchLocationsInSystem(): Promise<void> {
+        let newData: Location[] = [];
+
         for (const symbol of LOCATION_SYMBOLS) {
             const locations = await API.game.getLocations(symbol);
             if (!locations || locations.locations?.length === 0) continue;
 
-            this._data = this._data.concat(locations.locations);
+            newData = newData.concat(locations.locations);
         }
+
+        this._data = newData;
     }
 
     public getLocationData(symbol: string): Location {
