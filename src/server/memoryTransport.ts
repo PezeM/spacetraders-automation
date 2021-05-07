@@ -11,7 +11,7 @@ export interface LogData {
     timestamp?: string;
 }
 
-export interface Transformer {
+interface Transformer {
     (logData: LogData): any;
 }
 
@@ -84,21 +84,19 @@ export class MemoryTransport extends Transport {
 
         const log = this._transformer ? this._transformer(logData) : logData;
 
-        // Perform the writing to the remote service
-        console.log("Log data", log);
-
         if (level === 'error' || level === 'warn') {
-            this._errorOutput.push(log);
-            if (this._errorOutput.length > this._maxSize) {
-                this._errorOutput.shift();
-            }
+            this.writeToOutput(this._errorOutput, log);
         } else {
-            this._writeOutput.push(log);
-            if (this._writeOutput.length > this._maxSize) {
-                this._writeOutput.shift();
-            }
+            this.writeToOutput(this._writeOutput, log);
         }
 
         next();
+    }
+
+    private writeToOutput(output: LogData[], log: LogData) {
+        output.push(log);
+        if (output.length > this._maxSize) {
+            output.shift();
+        }
     }
 }
