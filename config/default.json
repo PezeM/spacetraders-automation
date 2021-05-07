@@ -1,6 +1,6 @@
 {
   "logsDir": "logs",
-  "logLevel": "info",
+  "logLevel": "debug",
   "token": "",
   "username": "",
   "strategy": "PROFIT",
@@ -48,7 +48,7 @@
     "XV-OE-2-91"
   ],
   "fluxConfig": {
-    "url": "url",
+    "url": "https://eu-central-1-1.aws.cloud2.influxdata.com",
     "token": "token",
     "org": "org@gmail.com",
     "bucket": "spacetraders"

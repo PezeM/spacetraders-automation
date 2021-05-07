@@ -16,42 +16,44 @@ export interface Transformer {
 }
 
 export interface MemoryTransportOptions extends TransportStream.TransportStreamOptions {
-    dataStream?: boolean;
-    apm?: any; // typeof Agent;
-    timestamp?: () => string;
-    level?: string;
-    index?: string;
-    indexPrefix?: string | Function;
-    indexSuffixPattern?: string;
+    maxSize?: number;
     transformer?: Transformer;
-    indexTemplate?: { [key: string]: any };
-    ensureIndexTemplate?: boolean;
-    flushInterval?: number;
-    waitForActiveShards?: number | 'all';
     handleExceptions?: boolean;
-    pipeline?: string;
-    buffering?: boolean;
-    bufferLimit?: number;
-    healthCheckTimeout?: string;
-    healthCheckWaitForStatus?: string;
-    healthCheckWaitForNodes?: string;
-    source?: string;
-    retryLimit?: number;
 }
 
 export class MemoryTransport extends Transport {
-    private source: Readable;
+    private readonly _writeOutput: LogData[];
+    private readonly _errorOutput: LogData[];
+
+    private readonly _maxSize: number;
+    private readonly _transformer?: Transformer;
+    private _source: Readable;
 
     constructor(options: MemoryTransportOptions) {
         super(options);
 
+        this._writeOutput = [];
+        this._errorOutput = [];
+
+        this.handleExceptions = options.handleExceptions ?? false;
+        this._maxSize = options.maxSize ?? 1000;
+        this._transformer = options.transformer;
+
         this.on('pipe', (source) => {
-            this.source = source;
+            this._source = source;
         });
 
         this.on('error', (err) => {
-            this.source.pipe(this); // re-pipes readable
+            this._source.pipe(this); // re-pipes readable
         });
+    }
+
+    get writeOutput() {
+        return this._writeOutput;
+    }
+
+    get errorOutput() {
+        return this._errorOutput;
     }
 
     log(info: any, next: () => void) {
@@ -80,8 +82,22 @@ export class MemoryTransport extends Transport {
             meta,
         };
 
+        const log = this._transformer ? this._transformer(logData) : logData;
+
         // Perform the writing to the remote service
-        console.log("Log data", logData);
+        console.log("Log data", log);
+
+        if (level === 'error' || level === 'warn') {
+            this._errorOutput.push(log);
+            if (this._errorOutput.length > this._maxSize) {
+                this._errorOutput.shift();
+            }
+        } else {
+            this._writeOutput.push(log);
+            if (this._writeOutput.length > this._maxSize) {
+                this._writeOutput.shift();
+            }
+        }
 
         next();
     }

@@ -52,7 +52,11 @@ const logger = winston.createLogger({
                 formatter
             )
         }),
-        new MemoryTransport({})
+        new MemoryTransport({
+            level: 'debug',
+            handleExceptions: true,
+            maxSize: 1000
+        })
     ],
     exitOnError: false
 });
