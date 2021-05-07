@@ -15,6 +15,12 @@ const formatter = format.printf((info) => {
     return `[${timestamp}] [${level}] ${message} ${meta}`;
 });
 
+const memoryTransport = new MemoryTransport({
+    level: 'debug',
+    handleExceptions: true,
+    maxSize: 1000
+});
+
 const logger = winston.createLogger({
     level: CONFIG.get("logLevel") ?? "debug",
     handleExceptions: true,
@@ -52,11 +58,7 @@ const logger = winston.createLogger({
                 formatter
             )
         }),
-        new MemoryTransport({
-            level: 'debug',
-            handleExceptions: true,
-            maxSize: 1000
-        })
+        memoryTransport
     ],
     exitOnError: false
 });
