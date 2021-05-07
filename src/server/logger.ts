@@ -2,6 +2,7 @@ import winston, {format} from "winston";
 import {CONFIG} from "./config";
 import * as fs from "fs";
 import DailyRotateFile from "winston-daily-rotate-file";
+import {MemoryTransport} from "./memoryTransport";
 
 if (!fs.existsSync(CONFIG.get('logsDir'))) {
     fs.mkdirSync(CONFIG.get('logsDir'));
@@ -34,7 +35,7 @@ const logger = winston.createLogger({
             filename: `${CONFIG.get('logsDir')}/log-%DATE%.log`,
         }),
         new DailyRotateFile({
-            level: CONFIG.get("logLevel") ?? "debug",
+            level: "warn",
             handleExceptions: true,
             maxSize: "20m",
             maxFiles: "7d",
@@ -50,7 +51,8 @@ const logger = winston.createLogger({
                 }),
                 formatter
             )
-        })
+        }),
+        new MemoryTransport({})
     ],
     exitOnError: false
 });
