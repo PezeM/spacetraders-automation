@@ -82,8 +82,6 @@ export class MemoryTransport extends Transport {
             meta,
         };
 
-
-        console.log(logData);
         const log = this._transformer ? this._transformer(logData) : logData;
 
         if (level === 'error' || level === 'warn') {
@@ -96,9 +94,9 @@ export class MemoryTransport extends Transport {
     }
 
     private writeToOutput(output: LogData[], log: LogData) {
-        output.push(log);
+        output.unshift(log);
         if (output.length > this._maxSize) {
-            output.shift();
+            output.length = this._maxSize;
         }
     }
 }

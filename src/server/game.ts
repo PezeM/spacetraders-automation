@@ -41,7 +41,6 @@ export class Game implements IGame {
                 await this.state.initializeStates();
 
                 logger.info('Start user state', {userState: this.state.userState.data});
-                logger.info(this.state.userState);
                 logger.info(`Ships ${this.state.userState.data.ships.length}`);
 
                 createExpressServer(this);

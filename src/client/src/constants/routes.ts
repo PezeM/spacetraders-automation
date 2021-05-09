@@ -6,4 +6,5 @@ export const ROUTES = {
     OwnShips: '/own-ships',
     ShipShop: '/ship-shop',
     Locations: '/locations',
+    Logs: '/logs'
 }

@@ -9,6 +9,7 @@ import {ROUTES} from "../constants/routes";
 import {OwnShips} from "./ownShips";
 import {ShipsShop} from "./shipsShop";
 import {LocationsView} from "./locationsView";
+import {LogsView} from "./logsView";
 
 const {Content} = Layout;
 
@@ -39,6 +40,7 @@ export const MainLayout = () => {
                             <Route path={ROUTES.OwnShips} component={OwnShips}/>
                             <Route path={ROUTES.ShipShop} component={ShipsShop}/>
                             <Route path={ROUTES.Locations} component={LocationsView}/>
+                            <Route path={ROUTES.Logs} component={LogsView}/>
                         </Switch>
                     </div>
                 </Content>
