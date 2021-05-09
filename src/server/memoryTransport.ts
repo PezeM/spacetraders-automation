@@ -8,7 +8,7 @@ export interface LogData {
     fullMessage?: string;
     level: string;
     meta: Record<string, any>;
-    timestamp?: string;
+    timestamp?: number;
 }
 
 interface Transformer {
@@ -78,10 +78,12 @@ export class MemoryTransport extends Transport {
             message,
             fullMessage,
             level,
-            timestamp,
+            timestamp: new Date(timestamp).getTime(),
             meta,
         };
 
+
+        console.log(logData);
         const log = this._transformer ? this._transformer(logData) : logData;
 
         if (level === 'error' || level === 'warn') {

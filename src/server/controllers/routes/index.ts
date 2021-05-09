@@ -6,6 +6,7 @@ import {loanRoutes} from "./loans";
 import {marketplaceRoutes} from "./marketplace";
 import {shipShopRoutes} from "./shipShop";
 import {locationRoutes} from "./location";
+import {logsRoutes} from "./logs";
 
 export const createRoutes = (game: IGame) => {
     const routes = Router();
@@ -20,6 +21,7 @@ export const createRoutes = (game: IGame) => {
     routes.use('/marketplace', marketplaceRoutes(game));
     routes.use('/ship-shop', shipShopRoutes(game));
     routes.use('/location', locationRoutes(game));
+    routes.use('/logs', logsRoutes(game));
 
     return routes;
 }

@@ -67,4 +67,5 @@ process.on('unhandledRejection', (reason, promise) => {
     throw reason;
 });
 
+export {memoryTransport};
 export default logger;
