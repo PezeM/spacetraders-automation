@@ -17,6 +17,8 @@ export class LogsController extends BaseController {
     }
 
     errors(req: Request, res: Response) {
-        res.status(200).send(memoryTransport.errorOutput);
+        const logs = getSortedData(memoryTransport.errorOutput, 'timestamp', false);
+
+        res.status(200).send(logs);
     }
 }
