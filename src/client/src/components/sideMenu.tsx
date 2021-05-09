@@ -8,7 +8,8 @@ import {
     SettingOutlined,
     TeamOutlined,
     UnorderedListOutlined,
-    ShopOutlined, GlobalOutlined
+    ShopOutlined, GlobalOutlined,
+    FileOutlined
 } from '@ant-design/icons';
 import {Key} from "antd/es/table/interface";
 import {useSelector} from "react-redux";
@@ -78,7 +79,7 @@ export const SideMenu: React.FC<Props> = ({handleOnCollapse, collapsed}) => {
                 </Menu.Item>
 
                 <Menu.Item key={ROUTES.Logs}>
-                    <GlobalOutlined/>
+                    <FileOutlined/>
                     <span className="nav-text">Logs</span>
                 </Menu.Item>
 
